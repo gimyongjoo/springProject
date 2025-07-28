@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: SpringStarter
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/springmvc?useUnicode=true&characterEncoding=utf8
+    username: root
+    password: 새비번
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  mvc:
+    view:
+      prefix: /WEB-INF/views/
+      suffix: .jsp
+
+  web:
+    locale: ko_KR
+    locale-resolver: fixed
+
+mybatis:
+#  config-location: classpath:mybatis-config.xml
+  mapper-locations: classpath:mapper/*Mapper.xml
+  type-aliases-package: com.study.springStarter.dto, com.study.springStarter.util
+
+server:
+  servlet:
+    context-path: /springStarter
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
