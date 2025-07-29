@@ -5,7 +5,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-@MapperScan(basePackages = "com.study.springStarter.dao")
+@MapperScan(basePackages = "com.study.springStarter.mapper")
 public class SpringStarterApplication {
 
 	public static void main(String[] args) {

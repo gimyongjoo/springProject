@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.study.springStarter.mapper.FolderMapper">
+    <insert id="insertFolder" parameterType="Folder" useGeneratedKeys="true" keyProperty="folderId">
+        insert into folder(userId, name) values(#{userId}, #{name})
+    </insert>
+
+    <select id="selectFolderById" parameterType="int" resultType="Folder">
+        select folderId, userId, name, createdDate from folder where folderId = #{folderId}
+    </select>
+
+    <select id="selectFoldersByUserId" parameterType="int" resultType="Folder">
+        select folderId, userId, name, createdDate from folder where userId = #{userId}
+    </select>
+
+    <update id="updateFolder" parameterType="Folder">
+        update folder set userId = #{userId}, name = #{name} where folderId = #{folderId}
+    </update>
+
+    <delete id="deleteFolder" parameterType="int">
+        delete from folder where folderId = #{folderId}
+    </delete>
+</mapper>

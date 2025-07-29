@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.study.springStarter.mapper.NoteMapper">
+    <insert id="insertNote" parameterType="Note" useGeneratedKeys="true" keyProperty="noteId">
+        insert into note(userId, folderId, title, content, isPinned, markdown_enabled)
+        values(#{userId}, #{folderId}, #{title}, #{content}, #{isPinned}, #{markdown_enabled})
+    </insert>
+
+    <select id="selectNoteById" parameterType="int" resultType="Note">
+        select noteId, userId, folderId, title, content, isPinned,
+       createdDate, updatedDate, markdown_enabled from note
+      where noteId= #{noteId}
+    </select>
+
+    <select id="selectNotesByUserId" parameterType="int" resultType="Note">
+        select noteId, userId, folderId, title, content, isPinned,
+               createdDate, updatedDate, markdown_enabled from note
+        where userId = #{userId}
+    </select>
+
+    <select id="selectNotesByFolderId" parameterType="int" resultType="Note">
+        select noteId, userId, folderId, title, content, isPinned,
+       createdDate, updatedDate, markdown_enabled from note
+        where folderId = #{folderId}
+    </select>
+
+    <select id="selectPinnedNotes" parameterType="int" resultType="Note">
+        select noteId, userId, folderId, title, content, isPinned,
+               createdDate, updatedDate, markdown_enabled from note
+        where userId = #{userId} and isPinned = true
+    </select>
+
+    <update id="updateNote" parameterType="Note">
+        update note set userId = #{userId}, folderId = #{folderId},
+    title = #{title}, content = #{content}, isPinned = #{isPinned},
+    markdown_enabled = #{markdown_enabled} where noteId = #{noteId}
+    </update>
+
+    <delete id="deleteNote" parameterType="int">
+        delete from note where noteId = #{noteId}
+    </delete>
+
+</mapper>

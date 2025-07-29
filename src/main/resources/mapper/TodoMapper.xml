@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.study.springStarter.mapper.TodoMapper">
+    <insert id="insertTodo" parameterType="Todo" useGeneratedKeys="true" keyProperty="todoId">
+        insert into todo(userId, noteId, content, dueDate) values(#{userId}, #{noteId}, #{content}, #{dueDate})
+    </insert>
+
+    <select id="selectTodoById" parameterType="int" resultType="Todo">
+        select todoId, userId, noteId, content, isDone, dueDate, createDate from todo where todoId = #{todoId}
+    </select>
+
+    <select id="selectTodosByUserId" parameterType="int" resultType="Todo">
+        select todoId, userId, noteId, content, isDone, dueDate, createDate from todo where userId = #{userId}
+    </select>
+
+    <select id="selectTodosByNoteId" parameterType="int" resultType="Todo">
+        select todoId, userId, noteId, content, isDone, dueDate, createDate from todo where noteId = #{noteId}
+    </select>
+
+    <update id="updateTodo" parameterType="Todo">
+        update todo set content = #{content}, isDone = #{isDone}, dueDate = #{dueDate} where todoId = #{todoId}
+    </update>
+
+    <delete id="deleteTodo" parameterType="int">
+        delete from todo where todoId = #{todoId}
+    </delete>
+</mapper>
