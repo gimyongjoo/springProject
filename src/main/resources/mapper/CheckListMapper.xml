@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.study.springStarter.mapper.CheckListMapper">
+    <insert id="insertCheckList" parameterType="CheckList" useGeneratedKeys="true" keyProperty="checkListId">
+        insert into checklist(noteId, content) values(#{noteId}, #{content})
+    </insert>
+
+    <select id="selectCheckListById" parameterType="int" resultType="CheckList">
+        select checkListId, noteId, content, isChecked from checklist where checkListId = #{checkListId}
+    </select>
+
+    <select id="selectCheckListByNoteId" parameterType="int" resultType="CheckList">
+        select checkListId, noteId, content, isChecked from checklist where noteId = #{noteId}
+    </select>
+
+    <update id="updateCheckList" parameterType="CheckList">
+        update checklist set content = #{content}, isChecked = #{isChecked} where checkListId = #{checkListId}
+    </update>
+
+    <delete id="deleteCheckList" parameterType="int">
+        delete from checklist where checkListId = #{checkListId}
+    </delete>
+</mapper>
