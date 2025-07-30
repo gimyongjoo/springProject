@@ -18,12 +18,14 @@
         select noteId, userId, folderId, title, content, isPinned,
                createdDate, updatedDate, markdown_enabled from note
         where userId = #{userId}
+        ORDER BY isPinned DESC, updatedDate DESC, createdDate DESC
     </select>
 
     <select id="selectNotesByFolderId" parameterType="int" resultType="Note">
         select noteId, userId, folderId, title, content, isPinned,
        createdDate, updatedDate, markdown_enabled from note
         where folderId = #{folderId}
+        ORDER BY isPinned DESC, updatedDate DESC, createdDate DESC
     </select>
 
     <select id="selectPinnedNotes" parameterType="int" resultType="Note">
@@ -35,7 +37,7 @@
     <update id="updateNote" parameterType="Note">
         update note set userId = #{userId}, folderId = #{folderId},
     title = #{title}, content = #{content}, isPinned = #{isPinned},
-    markdown_enabled = #{markdown_enabled} where noteId = #{noteId}
+    markdown_enabled = #{markdown_enabled}, updatedDate = NOW() where noteId = #{noteId}
     </update>
 
     <delete id="deleteNote" parameterType="int">

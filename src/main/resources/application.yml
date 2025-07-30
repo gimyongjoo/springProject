@@ -24,8 +24,10 @@ mybatis:
 
 server:
   servlet:
-    context-path: /springStarter
+    context-path: /myno
     encoding:
       charset: UTF-8
       enabled: true
       force: true
+  tomcat:
+    uri-encoding: UTF-8

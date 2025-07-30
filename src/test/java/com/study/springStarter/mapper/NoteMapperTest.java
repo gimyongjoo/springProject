@@ -112,7 +112,7 @@ public class NoteMapperTest {
 
         List<Note> pinnedNotes = noteMapper.selectPinnedNotes(testUserId);
         Assertions.assertEquals(2, pinnedNotes.size(), "핀 고정된 노트 2개 조회");
-        Assertions.assertTrue(pinnedNotes.stream().allMatch(Note::getPinned), "모든 노트가 핀 고정되어 있는지 확인");
+        Assertions.assertTrue(pinnedNotes.stream().allMatch(Note::getIsPinned), "모든 노트가 핀 고정되어 있는지 확인");
     }
 
     @Test
@@ -130,7 +130,7 @@ public class NoteMapperTest {
         Note updatedNote = noteMapper.selectNoteById(note.getNoteId());
         Assertions.assertEquals("업데이트 후 제목", updatedNote.getTitle());
         Assertions.assertEquals("업데이트 후 내용", updatedNote.getContent());
-        Assertions.assertTrue(updatedNote.getPinned());
+        Assertions.assertTrue(updatedNote.getIsPinned());
     }
 
     @Test
