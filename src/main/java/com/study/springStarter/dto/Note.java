@@ -94,12 +94,16 @@ public class Note { // 노트/페이지
         this.content = content;
     }
 
-    public Boolean getPinned() {
+    public Boolean getIsPinned() {
         return isPinned;
     }
 
     public void setPinned(Boolean pinned) {
         isPinned = pinned;
+    }
+
+    public void setIsPinned(Boolean isPinned) {
+        this.isPinned = isPinned;
     }
 
     public LocalDateTime getCreatedDate() {
