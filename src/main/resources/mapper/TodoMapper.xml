@@ -1,29 +1,33 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper
-        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
 <mapper namespace="com.study.springStarter.mapper.TodoMapper">
-    <insert id="insertTodo" parameterType="Todo" useGeneratedKeys="true" keyProperty="todoId">
-        insert into todo(userId, noteId, content, dueDate) values(#{userId}, #{noteId}, #{content}, #{dueDate})
+
+    <resultMap id="todoResultMap" type="com.study.springStarter.dto.Todo">
+        <id property="todoId" column="todoId"/> <result property="userId" column="userId"/> <result property="noteId" column="noteId"/> <result property="content" column="content"/>
+        <result property="isDone" column="isDone"/> <result property="dueDate" column="dueDate"/> <result property="createDate" column="createDate"/> </resultMap>
+
+    <insert id="insertTodo" parameterType="com.study.springStarter.dto.Todo" useGeneratedKeys="true" keyProperty="todoId">
+        INSERT INTO todo (userId, noteId, content, isDone, dueDate) VALUES (#{userId}, #{noteId}, #{content}, #{isDone}, #{dueDate})
     </insert>
 
-    <select id="selectTodoById" parameterType="int" resultType="Todo">
-        select todoId, userId, noteId, content, isDone, dueDate, createDate from todo where todoId = #{todoId}
-    </select>
+    <select id="selectTodosByNoteId" resultMap="todoResultMap">
+        SELECT todoId, userId, noteId, content, isDone, dueDate, createDate FROM todo
+        WHERE noteId = #{noteId} AND userId = #{userId} ORDER BY createDate ASC </select>
 
-    <select id="selectTodosByUserId" parameterType="int" resultType="Todo">
-        select todoId, userId, noteId, content, isDone, dueDate, createDate from todo where userId = #{userId}
-    </select>
+    <select id="selectTodoById" resultMap="todoResultMap">
+        SELECT todoId, userId, noteId, content, isDone, dueDate, createDate FROM todo
+        WHERE todoId = #{todoId} </select>
 
-    <select id="selectTodosByNoteId" parameterType="int" resultType="Todo">
-        select todoId, userId, noteId, content, isDone, dueDate, createDate from todo where noteId = #{noteId}
-    </select>
+    <update id="updateTodo" parameterType="com.study.springStarter.dto.Todo">
+        UPDATE todo
+        SET
+            content = #{content},
+            isDone = #{isDone}, dueDate = #{dueDate} WHERE todoId = #{todoId} AND userId = #{userId} </update>
 
-    <update id="updateTodo" parameterType="Todo">
-        update todo set content = #{content}, isDone = #{isDone}, dueDate = #{dueDate} where todoId = #{todoId}
-    </update>
+    <delete id="deleteTodo">
+        DELETE FROM todo
+        WHERE todoId = #{todoId} AND userId = #{userId} </delete>
 
-    <delete id="deleteTodo" parameterType="int">
-        delete from todo where todoId = #{todoId}
-    </delete>
 </mapper>

@@ -1,24 +1,25 @@
-<%@ page contentType="text/html;charset=utf-8"%>
+<%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %> <%-- fmt 라이브러리 추가 --%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <!DOCTYPE html>
 <html>
 <head>
-    <title>${note.title}</title>
+    <meta charset="UTF-8">
+    <title>${note.title} - 노트 상세</title>
     <style>
-        /* 기본 스타일 - dashboard.jsp와 동일 */
+        /* 기본 스타일 */
         body {
             font-family: 'Arial', sans-serif;
             margin: 0;
-            padding: 20px;
+            padding: 0;
             background-color: #f4f7f6;
             color: #333;
             line-height: 1.6;
         }
 
         .container {
-            max-width: 800px; /* 노트 내용에 맞게 너비 조정 */
+            max-width: 960px;
             margin: 40px auto;
             background-color: #fff;
             padding: 30px;
@@ -26,101 +27,54 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
 
-        h2, h3 {
+        h2 {
             color: #2c3e50;
             border-bottom: 2px solid #e0e0e0;
             padding-bottom: 10px;
             margin-bottom: 20px;
         }
 
-        /* 노트 내용 스타일 */
-        .note-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 5px; /* 날짜 정보 추가로 간격 줄임 */
-        }
-        .note-header h2 {
-            margin: 0;
-            border-bottom: none;
-            padding-bottom: 0;
-        }
-        .note-header .pinned-icon {
-            margin-left: 15px;
-            font-size: 1.5em;
-            color: #f39c12;
-        }
-
-        .note-metadata { /* 새로운 메타데이터 스타일 추가 */
-            font-size: 0.9em;
-            color: #777;
-            margin-bottom: 20px;
-            border-bottom: 1px dashed #e0e0e0;
-            padding-bottom: 10px;
-        }
-        .note-metadata p {
-            margin: 5px 0;
-        }
-
-        .note-content {
-            background-color: #fdfdfd;
-            border: 1px solid #eee;
-            padding: 20px;
-            border-radius: 8px;
-            min-height: 150px;
-            margin-bottom: 30px;
-            white-space: pre-wrap; /* 마크다운 텍스트 줄바꿈 유지 */
-            word-wrap: break-word; /* 긴 단어 줄바꿈 */
-        }
-
-        /* 섹션 스타일 (체크리스트, 이미지, 할 일) */
-        .section-header {
+        h3 {
             color: #34495e;
             margin-top: 30px;
             margin-bottom: 15px;
-            font-size: 1.1em;
-            font-weight: bold;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
         }
 
-        .item-list ul {
-            list-style: none;
-            padding: 0;
+        p {
+            margin-bottom: 1em;
+            word-wrap: break-word; /* 긴 텍스트 줄바꿈 */
+        }
+
+        .note-info {
+            font-size: 0.9em;
+            color: #777;
             margin-bottom: 20px;
         }
 
-        .item-list li {
+        .note-info span {
+            margin-right: 15px;
+        }
+
+        .note-content {
             background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
             border: 1px solid #eee;
-            margin-bottom: 8px;
-            padding: 10px 15px;
-            border-radius: 5px;
-            display: flex;
-            align-items: center;
+            min-height: 150px; /* 내용이 적어도 일정 높이를 가지도록 */
+            white-space: pre-wrap; /* 줄바꿈 유지 */
+            word-wrap: break-word;
         }
 
-        .item-list li input[type="checkbox"] {
-            margin-right: 10px;
-            transform: scale(1.2); /* 체크박스 크기 조절 */
-        }
-
-        .item-list li.completed label {
-            text-decoration: line-through;
-            color: #999;
-        }
-
-        .item-list img {
-            max-width: 100%; /* 이미지 크기 조절 */
-            height: auto;
-            display: block; /* 이미지 하단 여백 제거 */
-            margin-top: 10px;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        /* 버튼 스타일 - dashboard.jsp와 동일 */
-        .btn-group {
+        /* 버튼 그룹 */
+        .button-group {
             margin-top: 30px;
-            text-align: right;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end; /* 오른쪽 정렬 */
         }
+
         .btn {
             display: inline-block;
             background-color: #3498db;
@@ -130,7 +84,6 @@
             text-decoration: none;
             font-weight: bold;
             transition: background-color 0.3s ease;
-            margin-left: 10px; /* 버튼 간 간격 */
             border: none;
             cursor: pointer;
         }
@@ -139,106 +92,548 @@
             background-color: #2980b9;
         }
 
-        .btn-danger {
-            background-color: #e74c3c;
-        }
-        .btn-danger:hover {
-            background-color: #c0392b;
-        }
-
         .btn-secondary {
             background-color: #6c757d;
         }
+
         .btn-secondary:hover {
             background-color: #5a6268;
+        }
+
+        .btn-delete {
+            background-color: #e74c3c;
+        }
+
+        .btn-delete:hover {
+            background-color: #c0392b;
+        }
+
+        /* --- Todo List Styles --- */
+        .todo-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 15px;
+        }
+
+        .todo-list li {
+            display: flex;
+            align-items: center;
+            background-color: #fefefe;
+            padding: 10px 15px;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 5px;
+            border-radius: 5px;
+        }
+
+        .todo-list li:last-child {
+            border-bottom: none;
+        }
+
+        .todo-list .todo-checkbox {
+            margin-right: 10px;
+            transform: scale(1.2); /* 체크박스 크기 키우기 */
+        }
+
+        .todo-list .todo-content {
+            flex-grow: 1; /* 내용이 남은 공간 차지 */
+            word-break: break-all; /* 긴 단어도 줄바꿈 */
+        }
+
+        .todo-list .todo-completed {
+            text-decoration: line-through;
+            color: #888;
+        }
+
+        .todo-list .todo-actions {
+            margin-left: 10px;
+            display: flex;
+            gap: 5px;
+        }
+
+        .todo-list .todo-actions a {
+            font-size: 0.8em;
+            padding: 3px 8px;
+            border-radius: 3px;
+            text-decoration: none;
+            color: white;
+            background-color: #6c757d; /* 수정 버튼 색 */
+        }
+
+        .todo-list .todo-actions a.delete-todo-btn {
+            background-color: #e74c3c; /* 삭제 버튼 색 */
+        }
+
+        .todo-input-group {
+            display: flex;
+            margin-top: 15px;
+        }
+
+        .todo-input-group input[type="text"] {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px 0 0 5px;
+            font-size: 1em;
+        }
+
+        .todo-input-group button {
+            padding: 10px 15px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 0 5px 5px 0;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        .todo-input-group button:hover {
+            background-color: #2980b9;
+        }
+
+        /* --- Checklist Styles --- */
+        .checklist-container {
+            margin-top: 15px;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+        }
+
+        .checklist-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 10px;
+        }
+
+        .checklist-list li {
+            display: flex;
+            align-items: center;
+            background-color: #fefefe;
+            padding: 10px 15px;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 5px;
+            border-radius: 5px;
+        }
+
+        .checklist-list li:last-child {
+            border-bottom: none;
+        }
+
+        .checklist-list .checklist-checkbox {
+            margin-right: 10px;
+            transform: scale(1.2);
+        }
+
+        .checklist-list .checklist-content {
+            flex-grow: 1;
+            word-break: break-all;
+            cursor: pointer; /* 클릭해서 편집 가능하도록 */
+        }
+
+        .checklist-list .checklist-content.checked {
+            text-decoration: line-through;
+            color: #888;
+        }
+
+        .checklist-list .checklist-actions {
+            margin-left: 10px;
+            display: flex;
+            gap: 5px;
+        }
+
+        .checklist-list .checklist-actions a {
+            font-size: 0.8em;
+            padding: 3px 8px;
+            border-radius: 3px;
+            text-decoration: none;
+            color: white;
+            background-color: #6c757d;
+        }
+
+        .checklist-list .checklist-actions a.delete-checklist-btn {
+            background-color: #e74c3c;
+        }
+
+        .checklist-input-group {
+            display: flex;
+            margin-top: 15px;
+        }
+
+        .checklist-input-group input[type="text"] {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px 0 0 5px;
+            font-size: 1em;
+        }
+
+        .checklist-input-group button {
+            padding: 10px 15px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 0 5px 5px 0;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        .checklist-input-group button:hover {
+            background-color: #2980b9;
         }
     </style>
 </head>
 <body>
+<%@ include file="navi.jsp" %>
 <div class="container">
-    <div class="note-header">
-        <h2>${note.title}</h2>
-        <c:if test="${note.isPinned}"><span class="pinned-icon">📌</span></c:if>
-    </div>
+    <c:if test="${not empty errorMessage}">
+        <script>
+            alert("${errorMessage}");
+        </script>
+    </c:if>
+    <c:if test="${not empty successMessage}">
+        <script>
+            alert("${successMessage}");
+        </script>
+    </c:if>
 
-    <%-- 날짜 및 사용자 정보 추가 --%>
-    <div class="note-metadata">
-        <%-- note.createdDate와 note.updatedDate가 String이라고 가정하고 parseDate 사용 --%>
-        <fmt:parseDate value="${note.createdDate}" pattern="yyyy-MM-dd'T'HH:mm:ss" var="createdDateObj" />
-        <fmt:parseDate value="${note.updatedDate}" pattern="yyyy-MM-dd'T'HH:mm:ss" var="updatedDateObj" />
+    <h2>${note.title}</h2>
 
-        <p>작성자: <b>${user.name}</b></p>
-        <p>
-            작성일:
+    <div class="note-info">
+        <span>
+            생성일: <fmt:parseDate value="${note.createdDate}" pattern="yyyy-MM-dd'T'HH:mm" var="createdDateObj"/>
+            <fmt:formatDate value="${createdDateObj}" pattern="yyyy년 MM월 dd일 HH:mm"/>
+        </span>
+        <span>
+            수정일: <fmt:parseDate value="${note.updatedDate}" pattern="yyyy-MM-dd'T'HH:mm" var="updatedDateObj"/>
+            <fmt:formatDate value="${updatedDateObj}" pattern="yyyy년 MM월 dd일 HH:mm"/>
+        </span>
+
+        <span>
+            핀고정:
             <c:choose>
-                <c:when test="${not empty createdDateObj}">
-                    <fmt:formatDate value="${createdDateObj}" pattern="yyyy년 MM월 dd일 HH시 mm분" />
+                <c:when test="${note.isPinned}">
+                    <span style="font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', 'Arial', sans-serif;">📌</span>
                 </c:when>
                 <c:otherwise>
-                    정보 없음
+                    <span style="font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', 'Arial', sans-serif;">❌</span>
                 </c:otherwise>
             </c:choose>
-        </p>
-        <p>
-            최근 수정일:
-            <c:choose>
-                <c:when test="${not empty updatedDateObj}">
-                    <fmt:formatDate value="${updatedDateObj}" pattern="yyyy년 MM월 dd일 HH시 mm분" />
-                </c:when>
-                <c:otherwise>
-                    정보 없음
-                </c:otherwise>
-            </c:choose>
-        </p>
+        </span>
+        <c:if test="${not empty note.folderId}">
+            <span>폴더: ${folderName}</span>
+        </c:if>
     </div>
 
     <div class="note-content">
-        <div>${note.content}</div>
+        <p>${note.content}</p>
     </div>
 
-    <div class="item-list">
-        <c:if test="${not empty checkLists}">
-            <div class="section-header">체크리스트</div>
-            <ul>
-                <c:forEach var="checkList" items="${checkLists}">
-                    <li class="${checkList.isCompleted ? 'completed' : ''}">
-                        <input type="checkbox" ${checkList.isCompleted ? 'checked' : ''} disabled>
-                        <label>${checkList.content}</label>
-                    </li>
-                </c:forEach>
-            </ul>
-        </c:if>
-
-        <c:if test="${not empty images}">
-            <div class="section-header">이미지</div>
-            <ul>
-                <c:forEach var="image" items="${images}">
-                    <li>
-                        <img src="<c:url value="/upload/${image.path}"/>" alt="첨부 이미지" />
-                            <%-- 이미지 경로가 "/upload/" 아래에 있다고 가정 --%>
-                    </li>
-                </c:forEach>
-            </ul>
-        </c:if>
-
-        <c:if test="${not empty todos}">
-            <div class="section-header">할 일 목록</div>
-            <ul>
-                <c:forEach var="todo" items="${todos}">
-                    <li class="${todo.isCompleted ? 'completed' : ''}">
-                        <input type="checkbox" ${todo.isCompleted ? 'checked' : ''} disabled>
-                        <label>${todo.content}</label>
-                    </li>
-                </c:forEach>
-            </ul>
-        </c:if>
+    <div class="button-group">
+        <a href="<c:url value="/note/edit?noteId=${note.noteId}" />" class="btn">수정</a>
+        <a href="<c:url value="/note/delete?noteId=${note.noteId}" />" class="btn btn-delete"
+           onclick="return confirm('정말 이 노트를 삭제하시겠습니까?');">삭제</a>
+        <a href="<c:url value="/dashboard" />" class="btn btn-secondary">대시보드로</a>
     </div>
 
-    <div class="btn-group">
-        <a href="<c:url value="/note/edit?noteId=${note.noteId}"/>" class="btn">수정</a>
-        <a href="<c:url value="/note/delete?noteId=${note.noteId}"/>" class="btn btn-danger">삭제</a>
-        <a href="<c:url value="/dashboard"/>" class="btn btn-secondary">목록으로</a>
+    <hr/>
+
+    <h3>할 일</h3>
+    <ul id="todo-list-container" class="todo-list">
+        <c:forEach var="todo" items="${todos}">
+            <li>
+                <input type="checkbox" class="todo-checkbox"
+                       onclick="location.href='<c:url
+                               value="/todo/toggleDone?todoId=${todo.todoId}&noteId=${note.noteId}"/>'"
+                       <c:if test="${todo.done}">checked</c:if>>
+                <span class="todo-content <c:if test="${todo.done}">todo-completed</c:if>">${todo.content}</span>
+                <div class="todo-actions">
+                    <a href="<c:url value="/todo/delete?todoId=${todo.todoId}&noteId=${note.noteId}"/>"
+                       class="btn delete-todo-btn" onclick="return confirm('이 할 일을 삭제하시겠습니까?');">삭제</a>
+                </div>
+            </li>
+        </c:forEach>
+        <c:if test="${empty todos}">
+            <li>아직 할 일이 없습니다. 새로운 할 일을 추가해보세요!</li>
+        </c:if>
+    </ul>
+
+    <%-- 새 할 일 추가 폼 --%>
+    <form action="<c:url value="/todo/add"/>" method="post" class="todo-input-group">
+        <input type="hidden" name="noteId" value="${note.noteId}">
+        <input type="text" name="content" placeholder="새 할 일 추가" required>
+        <button type="submit">추가</button>
+    </form>
+
+    <hr/>
+
+    <%-- --- 체크리스트(Checklist) 섹션 --- --%>
+    <h3>체크리스트</h3>
+    <div class="checklist-container">
+        <ul id="checklist-list-container" class="checklist-list">
+            <%-- 체크리스트는 JavaScript로 동적으로 로드 및 렌더링됩니다. --%>
+        </ul>
+
+        <div class="checklist-input-group">
+            <input type="text" id="newChecklistContent" placeholder="새 체크리스트 항목 추가" required>
+            <button type="button" id="addChecklistBtn">추가</button>
+        </div>
     </div>
+
 </div>
+
+<%@ include file="footer.jsp" %>
+
+<script>
+    // 체크리스트 관련 JavaScript
+    document.addEventListener('DOMContentLoaded', function () {
+        const noteId = ${note.noteId};
+        const checklistContainer = document.getElementById('checklist-list-container');
+        const newChecklistContentInput = document.getElementById('newChecklistContent');
+        const addChecklistBtn = document.getElementById('addChecklistBtn');
+
+        // 체크리스트 목록 로드 함수
+        function loadChecklists() {
+            fetch('<c:url value="/api/checklist/list/"/>' + noteId)
+                .then(response => {
+                    if (!response.ok) {
+                        if (response.status === 401 || response.status === 403) {
+                            return response.text().then(text => {
+                                throw new Error(text || '인증/권한 오류');
+                            });
+                        }
+                        return response.text().then(text => {
+                            throw new Error(text || '체크리스트 로드 실패');
+                        });
+                    }
+                    return response.json();
+                })
+                .then(checklists => {
+                    checklistContainer.innerHTML = '';
+                    if (checklists.length === 0) {
+                        checklistContainer.innerHTML = '<li>아직 체크리스트 항목이 없습니다. 추가해보세요!</li>';
+                    } else {
+                        checklists.forEach(item => {
+                            const li = document.createElement('li');
+                            li.dataset.id = item.checkListId;
+                            li.innerHTML = `
+                                    <input type="checkbox" class="checklist-checkbox" ${item.isChecked ? 'checked' : ''}>
+                                    <span class="checklist-content ${item.isChecked ? 'checked' : ''}">${item.content}</span>
+                                    <div class="checklist-actions">
+                                        <a href="#" class="btn delete-checklist-btn">삭제</a>
+                                    </div>
+                                `;
+                            checklistContainer.appendChild(li);
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading checklists:', error);
+                    alert('체크리스트 로드 중 오류가 발생했습니다: ' + error.message);
+                    if (error.message.includes('로그인') || error.message.includes('권한')) {
+                        window.location.href = '<c:url value="/login"/>';
+                    }
+                });
+        }
+
+        // 새 체크리스트 항목 추가 함수
+        addChecklistBtn.addEventListener('click', function () {
+            const content = newChecklistContentInput.value.trim();
+            if (content === '') {
+                alert('체크리스트 내용을 입력해주세요.');
+                return;
+            }
+
+            fetch('<c:url value="/api/checklist"/>', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    noteId: noteId,
+                    content: content,
+                    isChecked: false
+                })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        if (response.status === 401 || response.status === 403) {
+                            return response.text().then(text => {
+                                throw new Error(text || '인증/권한 오류');
+                            });
+                        }
+                        return response.text().then(text => {
+                            throw new Error(text || '체크리스트 추가 실패');
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    newChecklistContentInput.value = '';
+                    loadChecklists();
+                })
+                .catch(error => {
+                    console.error('Error adding checklist:', error);
+                    alert('체크리스트 추가 중 오류가 발생했습니다: ' + error.message);
+                    if (error.message.includes('로그인') || error.message.includes('권한')) {
+                        window.location.href = '<c:url value="/login"/>';
+                    }
+                });
+        });
+
+        // 체크리스트 항목 이벤트 위임 (체크박스 토글, 삭제 버튼)
+        checklistContainer.addEventListener('change', function (event) {
+            if (event.target.classList.contains('checklist-checkbox')) {
+                const li = event.target.closest('li');
+                const checklistId = li.dataset.id;
+                const isChecked = event.target.checked;
+
+                fetch('<c:url value="/api/checklist/"/>' + checklistId, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({isChecked: isChecked})
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            if (response.status === 401 || response.status === 403) {
+                                return response.text().then(text => {
+                                    throw new Error(text || '인증/권한 오류');
+                                });
+                            }
+                            return response.text().then(text => {
+                                throw new Error(text || '체크 상태 업데이트 실패');
+                            });
+                        }
+                        const contentSpan = li.querySelector('.checklist-content');
+                        if (isChecked) {
+                            contentSpan.classList.add('checked');
+                        } else {
+                            contentSpan.classList.remove('checked');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error toggling checklist completion:', error);
+                        alert('체크리스트 상태 업데이트 중 오류가 발생했습니다: ' + error.message);
+                        if (error.message.includes('로그인') || error.message.includes('권한')) {
+                            window.location.href = '<c:url value="/login"/>';
+                        }
+                    });
+            }
+        });
+
+        checklistContainer.addEventListener('click', function (event) {
+            // 삭제 버튼 클릭
+            if (event.target.classList.contains('delete-checklist-btn')) {
+                event.preventDefault();
+                if (!confirm('정말 이 체크리스트 항목을 삭제하시겠습니까?')) {
+                    return;
+                }
+
+                const li = event.target.closest('li');
+                const checklistId = li.dataset.id;
+
+                fetch('<c:url value="/api/checklist/"/>' + checklistId, {
+                    method: 'DELETE'
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            if (response.status === 401 || response.status === 403) {
+                                return response.text().then(text => {
+                                    throw new Error(text || '인증/권한 오류');
+                                });
+                            }
+                            return response.text().then(text => {
+                                throw new Error(text || '체크리스트 삭제 실패');
+                            });
+                        }
+                        return response.text();
+                    })
+                    .then(message => {
+                        li.remove();
+                        if (checklistContainer.children.length === 0 || (checklistContainer.children.length === 1 && checklistContainer.children[0].textContent.includes('아직 체크리스트 항목이 없습니다'))) {
+                            checklistContainer.innerHTML = '<li>아직 체크리스트 항목이 없습니다. 추가해보세요!</li>';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error deleting checklist:', error);
+                        alert('체크리스트 삭제 중 오류가 발생했습니다: ' + error.message);
+                        if (error.message.includes('로그인') || error.message.includes('권한')) {
+                            window.location.href = '<c:url value="/login"/>';
+                        }
+                    });
+            }
+            // 내용 클릭 시 수정 가능하도록 (선택 사항 - 고급 기능)
+            if (event.target.classList.contains('checklist-content')) {
+                const span = event.target;
+                const originalContent = span.textContent;
+                const li = span.closest('li');
+                const checklistId = li.dataset.id;
+
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.value = originalContent;
+                input.style.width = 'calc(100% - 100px)';
+                input.style.padding = '5px';
+                input.style.border = '1px solid #ccc';
+                input.style.borderRadius = '3px';
+                span.replaceWith(input);
+                input.focus();
+
+                input.addEventListener('keypress', function (e) {
+                    if (e.key === 'Enter') {
+                        input.blur();
+                    }
+                });
+
+                input.addEventListener('blur', function () {
+                    const newContent = input.value.trim();
+                    if (newContent !== originalContent && newContent !== '') {
+                        fetch('<c:url value="/api/checklist/"/>' + checklistId, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({content: newContent})
+                        })
+                            .then(response => {
+                                if (!response.ok) {
+                                    if (response.status === 401 || response.status === 403) {
+                                        return response.text().then(text => {
+                                            throw new Error(text || '인증/권한 오류');
+                                        });
+                                    }
+                                    return response.text().then(text => {
+                                        throw new Error(text || '체크리스트 내용 업데이트 실패');
+                                    });
+                                }
+                                return response.text();
+                            })
+                            .then(() => {
+                                span.textContent = newContent;
+                                input.replaceWith(span);
+                            })
+                            .catch(error => {
+                                console.error('Error updating checklist content:', error);
+                                alert('체크리스트 내용 업데이트 중 오류가 발생했습니다: ' + error.message);
+                                span.textContent = originalContent;
+                                input.replaceWith(span);
+                                if (error.message.includes('로그인') || error.message.includes('권한')) {
+                                    window.location.href = '<c:url value="/login"/>';
+                                }
+                            });
+                    } else {
+                        span.textContent = originalContent;
+                        input.replaceWith(span);
+                    }
+                });
+            }
+        });
+
+
+        // 페이지 로드 시 체크리스트 목록 로드
+        loadChecklists();
+    });
+</script>
 </body>
 </html>

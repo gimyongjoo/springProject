@@ -6,9 +6,13 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.UnsupportedEncodingException;
@@ -18,6 +22,8 @@ public class UserController {
 
     @Autowired
     UserService service;
+    @Autowired
+    private UserService userService;
 
     @GetMapping("/login")
     public String login() {
@@ -96,6 +102,19 @@ public class UserController {
             System.out.println("회원가입 중 예외 발생: " + e.getMessage());
             reatt.addFlashAttribute("errorMessage", "서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
             return "redirect:/register/add";
+        }
+    }
+
+    @ResponseBody
+    @GetMapping("/register/idcheck/{email}")
+    public ResponseEntity<String> idcheck(@PathVariable String email) {
+        int cnt = 0;
+        try {
+            cnt = userService.countByEmail(email);
+            return new ResponseEntity<>(cnt+"", HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(cnt+"", HttpStatus.BAD_REQUEST);
         }
     }
 

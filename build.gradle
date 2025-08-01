@@ -49,3 +49,8 @@ tasks.named('test') {
 bootJar {
 	mainClass = 'com.study.springStarter.SpringStarterApplication'
 }
+
+// 모든 Java 컴파일 작업에 UTF-8 인코딩 강제
+tasks.withType(JavaCompile).configureEach {
+	options.encoding = 'UTF-8'
+}
