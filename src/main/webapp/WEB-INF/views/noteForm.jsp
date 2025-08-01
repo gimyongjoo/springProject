@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=utf-8"%>
+<%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html>
@@ -9,7 +9,7 @@
         body {
             font-family: 'Arial', sans-serif;
             margin: 0;
-            padding: 20px;
+            padding: 0;
             background-color: #f4f7f6;
             color: #333;
             line-height: 1.6;
@@ -90,6 +90,8 @@
     </style>
 </head>
 <body>
+<%@ include file="navi.jsp"%>
+
 <c:if test="${not empty errorMessage}">
     <script>
         alert("${errorMessage}");
@@ -135,5 +137,7 @@
         <a href="<c:url value="/dashboard"/>" class="btn btn-secondary">취소</a>
     </form>
 </div>
+
+<%@ include file="footer.jsp"%>
 </body>
 </html>

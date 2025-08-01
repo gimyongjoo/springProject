@@ -22,4 +22,5 @@
     <select id="countByName" parameterType="String" resultType="int">
         select count(*) from user where name = #{name}
     </select>
+
 </mapper>

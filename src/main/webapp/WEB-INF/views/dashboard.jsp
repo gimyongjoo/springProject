@@ -1,5 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ page contentType="text/html;charset=utf-8"%>
+<%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -9,7 +9,7 @@
         body {
             font-family: 'Arial', sans-serif;
             margin: 0;
-            padding: 20px;
+            padding: 0;
             background-color: #f4f7f6;
             color: #333;
             line-height: 1.6;
@@ -118,6 +118,8 @@
     </style>
 </head>
 <body>
+<%@ include file="navi.jsp"%>
+
 <c:if test="${not empty errorMessage}">
     <script>
         alert("${errorMessage}");
@@ -132,13 +134,11 @@
     <h2>내 노트 대시보드</h2>
 
     <h3>폴더</h3>
-    <a href="<c:url value="/folder/add"/>" class="btn">새 폴더 추가</a>
+        <a href="<c:url value="/folder/add"/>" class="btn">새 폴더 추가</a>
     <ul>
         <c:forEach var="folder" items="${folders}">
             <li>
                 <a href="<c:url value="/note/list?folderId=${folder.folderId}"/>">${folder.name}</a>
-                <!-- 폴더별 노트 추가 버튼 추가 -->
-                <a href="<c:url value="/note/add?folderId=${folder.folderId}"/>" class="btn btn-secondary" style="margin-left:10px;font-size:0.8em;">+ 새 노트</a>
             </li>
         </c:forEach>
         <c:if test="${empty folders}">
@@ -169,5 +169,7 @@
         <a href="<c:url value="/logout"/>">로그아웃</a>
     </div>
 </div>
+
+<%@ include file="footer.jsp"%>
 </body>
 </html>

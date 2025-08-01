@@ -1,25 +1,60 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper
-        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
 <mapper namespace="com.study.springStarter.mapper.CheckListMapper">
-    <insert id="insertCheckList" parameterType="CheckList" useGeneratedKeys="true" keyProperty="checkListId">
-        insert into checklist(noteId, content) values(#{noteId}, #{content})
+
+    <!-- 결과 매핑 -->
+    <resultMap id="checkListResultMap" type="com.study.springStarter.dto.CheckList">
+        <id property="checkListId" column="checkListId"/>
+        <result property="noteId" column="noteId"/>
+        <result property="content" column="content"/>
+        <result property="isChecked" column="isChecked"/>
+    </resultMap>
+
+    <!-- 체크리스트 추가 -->
+    <insert id="insertChecklist" parameterType="com.study.springStarter.dto.CheckList" useGeneratedKeys="true" keyProperty="checkListId">
+        INSERT INTO checklist (noteId, content, isChecked)
+        VALUES (#{noteId}, #{content}, #{isChecked})
     </insert>
 
-    <select id="selectCheckListById" parameterType="int" resultType="CheckList">
-        select checkListId, noteId, content, isChecked from checklist where checkListId = #{checkListId}
+    <!-- 노트별 체크리스트 전체 조회 (권한 검사 포함) -->
+    <select id="selectChecklistsByNoteId" resultMap="checkListResultMap">
+        SELECT c.checkListId, c.noteId, c.content, c.isChecked
+        FROM checklist c
+                 JOIN note n ON c.noteId = n.noteId
+        WHERE c.noteId = #{noteId}
+          AND n.userId = #{userId}
+        ORDER BY c.checkListId ASC
     </select>
 
-    <select id="selectCheckListByNoteId" parameterType="int" resultType="CheckList">
-        select checkListId, noteId, content, isChecked from checklist where noteId = #{noteId}
+    <!-- 단일 체크리스트 조회 (권한 검사 포함) -->
+    <select id="selectChecklistByIdAndUserId" resultMap="checkListResultMap">
+        SELECT c.checkListId, c.noteId, c.content, c.isChecked
+        FROM checklist c
+                 JOIN note n ON c.noteId = n.noteId
+        WHERE c.checkListId = #{checkListId}
+          AND n.userId = #{userId}
     </select>
 
-    <update id="updateCheckList" parameterType="CheckList">
-        update checklist set content = #{content}, isChecked = #{isChecked} where checkListId = #{checkListId}
+    <!-- 체크리스트 수정 (권한 검사 포함) -->
+    <update id="updateChecklist">
+        UPDATE checklist c
+            JOIN note n ON c.noteId = n.noteId
+            SET
+                c.content = #{checkList.content},
+                c.isChecked = #{checkList.isChecked}
+        WHERE c.checkListId = #{checkList.checkListId}
+          AND n.userId = #{userId}
     </update>
 
-    <delete id="deleteCheckList" parameterType="int">
-        delete from checklist where checkListId = #{checkListId}
+    <!-- 체크리스트 삭제 (권한 검사 포함) -->
+    <delete id="deleteChecklist">
+        DELETE c
+        FROM checklist c
+        JOIN note n ON c.noteId = n.noteId
+        WHERE c.checkListId = #{checkListId}
+        AND n.userId = #{userId}
     </delete>
+
 </mapper>

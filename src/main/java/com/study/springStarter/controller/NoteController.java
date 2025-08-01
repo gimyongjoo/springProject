@@ -2,6 +2,7 @@ package com.study.springStarter.controller;
 
 import com.study.springStarter.dto.Folder;
 import com.study.springStarter.dto.Note;
+import com.study.springStarter.dto.Todo;
 import com.study.springStarter.dto.User;
 import com.study.springStarter.service.*;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,17 +22,13 @@ public class NoteController {
 
     private final NoteService noteService;
     private final UserService userService; // userId 조회를 위해 필요
-    private final CheckListService checkListService;
-    private final ImageService imageService;
     private final TodoService todoService;
     private final FolderService folderService;
 
     @Autowired
-    public NoteController(NoteService noteService, UserService userService, CheckListService checkListService, ImageService imageService, TodoService todoService, FolderService folderService) {
+    public NoteController(NoteService noteService, UserService userService, TodoService todoService, FolderService folderService) {
         this.noteService = noteService;
         this.userService = userService;
-        this.checkListService = checkListService;
-        this.imageService = imageService;
         this.todoService = todoService;
         this.folderService = folderService;
     }
@@ -83,49 +80,54 @@ public class NoteController {
     }
 
     @GetMapping("/view")
-    public String viewNote(@RequestParam("noteId") Integer noteId, Model m, HttpSession session, HttpServletRequest req, RedirectAttributes reatt) {
-        if(!loginCheck(session)) {
-            reatt.addFlashAttribute("errorMessage", "로그인 후 이용 가능합니다.");
-            return "redirect:/login?toURL=" + req.getRequestURL();
-        }
-        if (noteId == null) {
-            reatt.addFlashAttribute("errorMessage", "노트 번호가 잘못되었습니다.");
-            return "redirect:/dashboard";
-        }
-        String email = (String) session.getAttribute("email");
-
-        User user = null;
+    public String viewNote(@RequestParam("noteId") int noteId, Model m, HttpSession session, RedirectAttributes reatt, HttpServletRequest req) {
         try {
-            user = userService.findByEmail(email);
-        } catch (Exception e) {
-            e.printStackTrace();
-            reatt.addFlashAttribute("errorMessage", "사용자 정보 조회 중 오류가 발생했습니다.");
-            return "redirect:/login";
-        }
-        if (user == null) {
-            reatt.addFlashAttribute("errorMessage", "유효하지 않은 사용자 정보입니다.");
-            return "redirect:/login";
-        }
+            User currentUser = getCurrentUser(session, reatt, req.getRequestURL().toString());
 
-        try {
             Note note = noteService.findNoteById(noteId);
-            if(note == null || note.getUserId() != user.getUserId()) {
+            if (note == null || note.getUserId() != currentUser.getUserId()) {
                 reatt.addFlashAttribute("errorMessage", "해당 노트를 조회할 권한이 없습니다.");
                 return "redirect:/dashboard";
             }
 
             m.addAttribute("note", note);
-            m.addAttribute("checkLists", checkListService.findCheckListsByNoteId(noteId));
-            m.addAttribute("images", imageService.findImagesByNoteId(noteId));
-            m.addAttribute("todos", todoService.findTodosByNoteId(noteId));
-            m.addAttribute("user", user);
+            m.addAttribute("user", currentUser);
+
+            // 폴더 이름 가져와서 Model에 추가
+            if (note.getFolderId() != null) {
+                Folder folder = folderService.findFolderById(note.getFolderId());
+                if (folder != null) {
+                    m.addAttribute("folderName", folder.getName());
+                }
+            }
+
+            // ★ 해당 노트의 할 일 목록 가져와서 Model에 추가
+            List<Todo> todos = todoService.findTodosByNoteId(noteId, currentUser.getUserId());
+            m.addAttribute("todos", todos);
+
+            return "noteView";
+        } catch (IllegalAccessException e) {
+            String redirectPath = e.getMessage().substring(e.getMessage().indexOf("redirect path:") + "redirect path:".length()).trim();
+            return redirectPath;
         } catch (Exception e) {
             e.printStackTrace();
-            reatt.addFlashAttribute("errorMessage", "노트 상세 정보를 불러오는 중 오류가 발생했습니다.");
+            reatt.addFlashAttribute("errorMessage", "노트 정보를 불러오는 중 오류가 발생했습니다.");
             return "redirect:/dashboard";
         }
+    }
 
-        return "noteView";
+    private User getCurrentUser(HttpSession session, RedirectAttributes reatt, String requestURI) throws Exception {
+        String email = (String) session.getAttribute("email");
+        if (email == null) {
+            reatt.addFlashAttribute("errorMessage", "로그인 후 이용 가능합니다.");
+            throw new IllegalAccessException("User not logged in with redirect path: /login?toURL=" + requestURI);
+        }
+        User user = userService.findByEmail(email);
+        if (user == null) {
+            reatt.addFlashAttribute("errorMessage", "유효하지 않은 사용자 정보입니다.");
+            throw new IllegalAccessException("Invalid user information with redirect path: /login");
+        }
+        return user;
     }
 
     @GetMapping("/add")
@@ -134,13 +136,20 @@ public class NoteController {
             reatt.addFlashAttribute("errorMessage", "로그인 후 이용 가능합니다.");
             return "redirect:/login?toURL=" + req.getRequestURL();
         }
-
+        String email = (String) session.getAttribute("email");
+        User user = null;
+        try {
+            user = userService.findByEmail(email);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         Note note = new Note();
         if(folderId != null) {
             note.setFolderId(folderId);
         }
         m.addAttribute("mode", "add");
         m.addAttribute("note", note); // 폼 바인딩을 위해 빈 Note 객체 전달
+        m.addAttribute("user", user);
 
         return "noteForm";
     }
@@ -227,7 +236,7 @@ public class NoteController {
 
         System.out.println(params);
         System.out.println("isPinned from form: " + note.getIsPinned());
-        return "redirect:/dashboard";
+        return "redirect:/note/list?folderId=" + note.getFolderId();
     }
 
     @PostMapping("/edit")
@@ -304,17 +313,26 @@ public class NoteController {
                 return "redirect:/dashboard";
             }
 
+            Integer folderId = existingNote.getFolderId();
+
             int result = noteService.deleteNote(noteId);
             if (result > 0) {
                 reatt.addFlashAttribute("successMessage", "노트가 성공적으로 삭제되었습니다.");
             } else {
                 reatt.addFlashAttribute("errorMessage", "노트 삭제에 실패했습니다.");
             }
+
+            if(folderId != null) {
+                return "redirect:/note/list?folderId=" + folderId;
+            } else {
+                return "redirect:/dashboard";
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
             reatt.addFlashAttribute("errorMessage", "노트 삭제 중 오류가 발생했습니다.");
+            return "redirect:/dashboard";
         }
-        return "redirect:/dashboard"; // 삭제 후 대시보드로 이동
     }
 
 
