@@ -119,7 +119,7 @@ public class FolderController {
             Folder folder = folderService.findFolderById(folderId);
             if(folder == null || folder.getUserId() != user.getUserId()) {
                 reatt.addFlashAttribute("errorMessage", "해당 폴더를 수정할 권한이 없습니다.");
-                return "redirect:/dashboard";
+                return "redirect:/note/list?folderId=" + folderId;
             }
 
             m.addAttribute("folder", folder);
@@ -129,9 +129,9 @@ public class FolderController {
         } catch (Exception e) {
             e.printStackTrace();
             reatt.addFlashAttribute("", "해당 파일을 불러오는 중 오류가 발생했습니다.");
-            return "redirect:/dashboard";
+            return "redirect:/note/list?folderId=" + folderId;
         }
-
+        System.out.println(folderId);
 
         return "folderForm";
     }
@@ -177,7 +177,7 @@ public class FolderController {
             e.printStackTrace();
         }
 
-        return "redirect:/dashboard";
+        return "redirect:/note/list?folderId=" + folder.getFolderId();
     }
 
     @GetMapping("/delete")
@@ -208,6 +208,7 @@ public class FolderController {
             }
 
             int res = folderService.deleteFolder(folderId);
+            System.out.println(res);
             if(res > 0) {
                 reatt.addFlashAttribute("successMessage", "폴더가 성공적으로 삭제되었습니다.");
             } else {

@@ -59,6 +59,9 @@ public class CheckListController {
      // 새로운 체크리스트 항목 추가 (POST /api/checklist)
     @PostMapping
     public ResponseEntity<?> addChecklist(@RequestBody CheckList checkList, HttpSession session) { // CheckList로 변경
+        if (checkList.getContent() == null || checkList.getContent().trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("내용을 입력하세요.");
+        }
         try {
             User currentUser = getCurrentUser(session);
             // checkList DTO에는 userId가 없지만, 노트의 userId를 통해 간접적으로 권한 확인
@@ -81,6 +84,9 @@ public class CheckListController {
     @PutMapping("/{checkListId}")
     public ResponseEntity<?> updateChecklist(@PathVariable("checkListId") Integer checkListId, // Integer로 변경
                                              @RequestBody CheckList checkListUpdate, HttpSession session) { // CheckList로 변경
+        if (checkListUpdate.getContent() == null || checkListUpdate.getContent().trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("내용을 입력하세요.");
+        }
         try {
             User currentUser = getCurrentUser(session);
 
@@ -117,6 +123,23 @@ public class CheckListController {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("체크리스트 삭제 중 오류가 발생했습니다: " + e.getMessage());
+        }
+    }
+
+    // 체크리스트 전체 목록을 noteId로 반환 (GET /api/checklist?noteId=85)
+    @GetMapping
+    public ResponseEntity<?> getChecklistsByNoteIdQuery(@RequestParam("noteId") Integer noteId, HttpSession session) {
+        try {
+            User currentUser = getCurrentUser(session);
+            List<CheckList> checkLists = checkListService.findChecklistsByNoteId(noteId, currentUser.getUserId());
+            return ResponseEntity.ok(checkLists);
+        } catch (IllegalAccessException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("체크리스트 로드 중 오류가 발생했습니다: " + e.getMessage());
         }
     }
 }

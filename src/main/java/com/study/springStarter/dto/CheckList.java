@@ -1,5 +1,7 @@
 package com.study.springStarter.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.Objects;
 
 public class CheckList { // 노트 안의 체크리스트 CRUD

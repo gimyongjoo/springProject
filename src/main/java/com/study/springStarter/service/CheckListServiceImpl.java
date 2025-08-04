@@ -26,7 +26,7 @@ public class CheckListServiceImpl implements CheckListService { // CheckListServ
         if (noteId == null) {
             throw new IllegalArgumentException("노트 ID는 필수입니다.");
         }
-        Note note = noteService.findNoteById(noteId); // 노트 조회
+        Note note = noteService.findNoteById(noteId, userId); // 노트 조회
         if (note == null) {
             throw new IllegalArgumentException("노트를 찾을 수 없습니다.");
         }

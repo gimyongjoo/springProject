@@ -107,7 +107,7 @@
         <c:if test="${mode eq 'add'}">새 노트 작성</c:if>
         <c:if test="${mode eq 'edit'}">노트 수정</c:if>
     </h2>
-    <form action="<c:url value="/note/${mode}"/>" method="post">
+    <form id="noteForm" action="<c:url value="/note/${mode}"/>" method="post" enctype="multipart/form-data">
         <input type="hidden" name="noteId" value="${note.noteId}" />
         <input type="hidden" name="folderId" value="${note.folderId}" />
         <input type="hidden" name="mode" value="${mode}" />
@@ -120,6 +120,12 @@
         <div class="form-group">
             <label for="content">내용</label>
             <textarea id="content" name="content">${note.content}</textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="imageUpload">이미지 첨부</label>
+            <input type="file" id="imageUpload" name="files" multiple accept="image/*">
+            <small class="form-text text-muted">노트 내용에 이미지를 삽입할 수 있습니다. 이미지는 마크다운 형식으로 자동으로 추가됩니다.</small>
         </div>
 
         <div class="form-group">
@@ -139,5 +145,58 @@
 </div>
 
 <%@ include file="footer.jsp"%>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#imageUpload').on('change', function(e) {
+            var files = e.target.files;
+            if (files.length > 0) {
+                var formData = new FormData();
+                var noteId = $('input[name="noteId"]').val();
+
+                // 노트가 새로 추가되는 경우 noteId가 없으므로, 경고 메시지를 표시합니다.
+                if (!noteId || noteId === '0') {
+                    alert('새 노트 작성 시에는 먼저 노트를 저장한 후 이미지를 추가해 주세요.');
+                    // 파일 선택 취소
+                    $(this).val('');
+                    return;
+                }
+
+                formData.append('noteId', noteId);
+                // multiple 속성을 사용하므로 파일들을 루프를 돌며 추가합니다.
+                for (var i = 0; i < files.length; i++) {
+                    formData.append('file', files[i]);
+                }
+
+                $.ajax({
+                    url: '<c:url value="/note/uploadImage"/>',
+                    type: 'POST',
+                    data: formData,
+                    processData: false, // data를 쿼리 문자열로 변환하지 않음
+                    contentType: false, // 서버에 보낼 데이터의 컨텐츠 타입을 설정하지 않음
+                    success: function(response) {
+                        if (response.success) {
+                            var contentTextarea = $('#content');
+                            var currentContent = contentTextarea.val();
+                            // 업로드 성공 시, 반환된 파일 경로를 마크다운 형식으로 내용에 추가
+                            var newContent = currentContent + '\n\n' + '![image](' + response.filePath + ')\n';
+                            contentTextarea.val(newContent);
+                            alert('이미지 업로드 성공');
+                            // 파일 선택 초기화
+                            $('#imageUpload').val('');
+                        } else {
+                            alert('이미지 업로드 실패: ' + response.error);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        alert('이미지 업로드 중 오류가 발생했습니다.');
+                        console.error("AJAX Error: ", status, error);
+                    }
+                });
+            }
+        });
+    });
+</script>
 </body>
 </html>

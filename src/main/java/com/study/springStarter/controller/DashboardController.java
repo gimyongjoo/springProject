@@ -47,14 +47,14 @@ public class DashboardController {
 
         try {
             m.addAttribute("folders", folderService.findFoldersByUserId(userId));
-            m.addAttribute("notes", noteService.getNotesByUserId(userId));
+            m.addAttribute("notes", noteService.findAllNotesByUserId(userId));
         } catch (Exception e) {
             e.printStackTrace();
             return "redirect:/login";
         }
         m.addAttribute("user", user);
 
-        return "dashboard";
+        return "dashboard2";
     }
 
     private boolean loginCheck(HttpSession session) {

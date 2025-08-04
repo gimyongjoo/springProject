@@ -75,37 +75,60 @@
             justify-content: flex-end; /* 오른쪽 정렬 */
         }
 
-        .btn {
+        /* 버튼 통일 스타일 */
+        .button-group .btn,
+        .button-group button.btn {
             display: inline-block;
-            background-color: #3498db;
-            color: white;
-            padding: 10px 15px;
+            height: 44px;
+            min-width: 90px;
+            padding: 0 20px;
+            line-height: 44px;
             border-radius: 5px;
-            text-decoration: none;
+            font-size: 1em;
             font-weight: bold;
-            transition: background-color 0.3s ease;
             border: none;
             cursor: pointer;
-        }
-
-        .btn:hover {
-            background-color: #2980b9;
-        }
-
-        .btn-secondary {
-            background-color: #6c757d;
-        }
-
-        .btn-secondary:hover {
-            background-color: #5a6268;
+            text-align: center;
+            vertical-align: middle;
+            box-sizing: border-box;
+            background-color: #3498db;
+            color: white;
+            transition: background-color 0.3s;
+            margin: 0;
+            text-decoration: none;
         }
 
         .btn-delete {
-            background-color: #e74c3c;
+            background-color: red !important;
         }
 
         .btn-delete:hover {
+            background-color: #c0392b !important;
+        }
+
+        .button-group .btn:hover,
+        .button-group button.btn:hover {
+            background-color: #2980b9;
+        }
+
+        .button-group .btn-secondary {
+            background-color: #6c757d;
+        }
+        .button-group .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+        .button-group .btn-delete {
+            background-color: #e74c3c;
+        }
+        .button-group .btn-delete:hover {
             background-color: #c0392b;
+        }
+
+        .button-group form {
+            display: inline;
+            margin: 0;
+            padding: 0;
         }
 
         /* --- Todo List Styles --- */
@@ -325,14 +348,17 @@
     </div>
 
     <div class="note-content">
-        <p>${note.content}</p>
+        <c:out value="${htmlContent}" escapeXml="false"/>
     </div>
 
     <div class="button-group">
         <a href="<c:url value="/note/edit?noteId=${note.noteId}" />" class="btn">수정</a>
-        <a href="<c:url value="/note/delete?noteId=${note.noteId}" />" class="btn btn-delete"
-           onclick="return confirm('정말 이 노트를 삭제하시겠습니까?');">삭제</a>
-        <a href="<c:url value="/dashboard" />" class="btn btn-secondary">대시보드로</a>
+        <form id="deleteNoteForm" action="<c:url value='/note/delete'/>" method="post" style="display: inline;">
+            <input type="hidden" name="noteId" value="${note.noteId}" />
+            <button type="submit" class="btn btn-delete"
+                    onclick="return confirm('정말 이 노트를 삭제하시겠습니까?');">삭제</button>
+        </form>
+        <a href="<c:url value="/note/list?folderId=${note.folderId}" />" class="btn btn-secondary">대시보드로</a>
     </div>
 
     <hr/>
@@ -386,7 +412,8 @@
 <script>
     // 체크리스트 관련 JavaScript
     document.addEventListener('DOMContentLoaded', function () {
-        const noteId = ${note.noteId};
+        const noteId = `${note.noteId}`;
+        console.log(noteId)
         const checklistContainer = document.getElementById('checklist-list-container');
         const newChecklistContentInput = document.getElementById('newChecklistContent');
         const addChecklistBtn = document.getElementById('addChecklistBtn');
@@ -408,20 +435,28 @@
                     return response.json();
                 })
                 .then(checklists => {
+                    console.log('서버에서 받은 체크리스트:', checklists);
                     checklistContainer.innerHTML = '';
                     if (checklists.length === 0) {
                         checklistContainer.innerHTML = '<li>아직 체크리스트 항목이 없습니다. 추가해보세요!</li>';
                     } else {
                         checklists.forEach(item => {
+                            console.log('content before li:', item.content);
                             const li = document.createElement('li');
                             li.dataset.id = item.checkListId;
                             li.innerHTML = `
-                                    <input type="checkbox" class="checklist-checkbox" ${item.isChecked ? 'checked' : ''}>
-                                    <span class="checklist-content ${item.isChecked ? 'checked' : ''}">${item.content}</span>
-                                    <div class="checklist-actions">
-                                        <a href="#" class="btn delete-checklist-btn">삭제</a>
-                                    </div>
-                                `;
+                                <input type="checkbox" class="checklist-checkbox" ${item.checked ? 'checked' : ''}>
+                                <span class="checklist-content ${item.checked ? 'checked' : ''}" style="color: black; background: yellow;">테스트값</span>
+                                <div class="checklist-actions">
+                                    <a href="#" class="btn delete-checklist-btn">삭제</a>
+                                </div>
+                            `;
+                            console.log('li.innerHTML:', li.innerHTML);
+                                    let checked = `${item.checked}`;
+                                    let content = `${item.content}`;
+                                    console.log('checked' + checked);
+                                    console.log('content' + content);
+                                    console.log('li:' + li)
                             checklistContainer.appendChild(li);
                         });
                     }

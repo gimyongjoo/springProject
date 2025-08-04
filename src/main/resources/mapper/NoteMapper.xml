@@ -3,45 +3,94 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.study.springStarter.mapper.NoteMapper">
-    <insert id="insertNote" parameterType="Note" useGeneratedKeys="true" keyProperty="noteId">
+
+    <resultMap id="noteResultMap" type="com.study.springStarter.dto.Note">
+        <id property="noteId" column="noteId"/>
+        <result property="userId" column="userId"/>
+        <result property="folderId" column="folderId"/>
+        <result property="title" column="title"/>
+        <result property="content" column="content"/>
+        <result property="isPinned" column="isPinned"/>
+        <result property="createdDate" column="createdDate"/>
+        <result property="updatedDate" column="updatedDate"/>
+        <result property="markdown_enabled" column="markdown_enabled"/>
+    </resultMap>
+
+    <insert id="insertNote" parameterType="com.study.springStarter.dto.Note" useGeneratedKeys="true" keyProperty="noteId">
         insert into note(userId, folderId, title, content, isPinned, markdown_enabled)
         values(#{userId}, #{folderId}, #{title}, #{content}, #{isPinned}, #{markdown_enabled})
     </insert>
 
-    <select id="selectNoteById" parameterType="int" resultType="Note">
+    <select id="selectNoteById" resultMap="noteResultMap">
         select noteId, userId, folderId, title, content, isPinned,
-       createdDate, updatedDate, markdown_enabled from note
-      where noteId= #{noteId}
+               createdDate, updatedDate, markdown_enabled from note
+        where noteId= #{noteId} AND userId = #{userId}
     </select>
 
-    <select id="selectNotesByUserId" parameterType="int" resultType="Note">
+    <select id="selectNotesByUserId" resultMap="noteResultMap">
         select noteId, userId, folderId, title, content, isPinned,
                createdDate, updatedDate, markdown_enabled from note
         where userId = #{userId}
         ORDER BY isPinned DESC, updatedDate DESC, createdDate DESC
     </select>
 
-    <select id="selectNotesByFolderId" parameterType="int" resultType="Note">
+    <select id="selectNotesByFolderId" resultMap="noteResultMap">
         select noteId, userId, folderId, title, content, isPinned,
-       createdDate, updatedDate, markdown_enabled from note
-        where folderId = #{folderId}
+               createdDate, updatedDate, markdown_enabled from note
+        where folderId = #{folderId} AND userId = #{userId}
         ORDER BY isPinned DESC, updatedDate DESC, createdDate DESC
     </select>
 
-    <select id="selectPinnedNotes" parameterType="int" resultType="Note">
+    <select id="selectPinnedNotes" resultMap="noteResultMap">
         select noteId, userId, folderId, title, content, isPinned,
                createdDate, updatedDate, markdown_enabled from note
         where userId = #{userId} and isPinned = true
     </select>
 
-    <update id="updateNote" parameterType="Note">
-        update note set userId = #{userId}, folderId = #{folderId},
-    title = #{title}, content = #{content}, isPinned = #{isPinned},
-    markdown_enabled = #{markdown_enabled}, updatedDate = NOW() where noteId = #{noteId}
+    <update id="updateNote" parameterType="com.study.springStarter.dto.Note">
+        update note set folderId = #{folderId},
+                        title = #{title}, content = #{content}, isPinned = #{isPinned},
+                        markdown_enabled = #{markdown_enabled}, updatedDate = NOW()
+        where noteId = #{noteId} AND userId = #{userId}
     </update>
 
-    <delete id="deleteNote" parameterType="int">
-        delete from note where noteId = #{noteId}
+    <delete id="deleteNote">
+        delete from note where noteId = #{noteId} AND userId = #{userId}
     </delete>
+
+    <select id="searchAndFilterAndSortNotes" resultMap="noteResultMap">
+        SELECT noteId, userId, folderId, title, content, isPinned, createdDate, updatedDate, markdown_enabled
+        FROM note
+        WHERE userId = #{userId}
+        <if test="condition.keyword != null and condition.keyword != ''">
+            AND (title LIKE CONCAT('%', #{condition.keyword}, '%') OR content LIKE CONCAT('%', #{condition.keyword}, '%'))
+        </if>
+        <if test="condition.folderId != null">
+            AND folderId = #{condition.folderId}
+        </if>
+        <if test="condition.isPinned != null">
+            AND isPinned = #{condition.isPinned}
+        </if>
+        <choose>
+            <when test="condition.sortBy == 'createdDate'">
+                ORDER BY createdDate
+            </when>
+            <when test="condition.sortBy == 'updatedDate'">
+                ORDER BY updatedDate
+            </when>
+            <when test="condition.sortBy == 'title'">
+                ORDER BY title
+            </when>
+            <otherwise>
+                ORDER BY createdDate
+            </otherwise>
+        </choose>
+        <if test="condition.sortOrder == 'desc'">
+            DESC
+        </if>
+        <if test="condition.sortOrder == 'asc'">
+            ASC
+        </if>
+    </select>
 
 </mapper>
