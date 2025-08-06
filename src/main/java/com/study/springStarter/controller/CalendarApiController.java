@@ -1,8 +1,11 @@
 package com.study.springStarter.controller;
 
+import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.Event;
+import com.google.api.services.calendar.model.EventDateTime;
 import com.google.api.services.calendar.model.Events;
+import com.study.springStarter.dto.CalendarEvent;
 import com.study.springStarter.service.GoogleCalendarService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +57,7 @@ public class CalendarApiController {
 
     // 새로운 google calendar 이벤트를 생성하는 api
     @PostMapping("/events")
-    public ResponseEntity<Event> addEvent(@RequestBody Event event, HttpSession session) {
+    public ResponseEntity<Event> addEvent(@RequestBody CalendarEvent calendarEvent, HttpSession session) {
         String email = (String) session.getAttribute("email");
         if(email == null) {
             return ResponseEntity.status(401).build();
@@ -65,6 +68,19 @@ public class CalendarApiController {
             if(client == null) {
                 return ResponseEntity.status(403).build();
             }
+
+            DateTime start = new DateTime(calendarEvent.getStartDateTime());
+            DateTime end = new DateTime(calendarEvent.getEndDateTime());
+
+            EventDateTime startEventDateTime = new EventDateTime().setDateTime(start);
+            EventDateTime endEventDateTime = new EventDateTime().setDateTime(end);
+
+            Event event = new Event()
+                    .setSummary(calendarEvent.getSummary())
+                    .setLocation(calendarEvent.getLocation())
+                    .setDescription(calendarEvent.getDescription())
+                    .setStart(startEventDateTime)
+                    .setEnd(endEventDateTime);
 
             Event createdEvent = client.events().insert("primary", event).execute();
             return ResponseEntity.ok(createdEvent);
@@ -75,8 +91,8 @@ public class CalendarApiController {
     }
 
     // 기존 google calendar 이벤트를 수정하는 api
-    @PutMapping("/event/{eventId}")
-    public ResponseEntity<Event> updateEvent(@PathVariable String eventId, @RequestBody Event event, HttpSession session) {
+    @PutMapping("/events/{eventId}")
+    public ResponseEntity<Event> updateEvent(@PathVariable String eventId, @RequestBody CalendarEvent calendarEvent, HttpSession session) {
         String email = (String) session.getAttribute("email");
         if(email == null) {
             return ResponseEntity.status(401).build();
@@ -87,6 +103,17 @@ public class CalendarApiController {
             if(client == null) {
                 return ResponseEntity.status(403).build();
             }
+
+            DateTime start = new DateTime(calendarEvent.getStartDateTime());
+            DateTime end = new DateTime(calendarEvent.getEndDateTime());
+
+            EventDateTime startEventDateTime = new EventDateTime().setDateTime(start).setTimeZone("Asia/Seoul");
+            EventDateTime endEventDateTime = new EventDateTime().setDateTime(end).setTimeZone("Asia/Seoul");
+
+            Event event = new Event()
+                    .setSummary(calendarEvent.getSummary())
+                    .setStart(startEventDateTime)
+                    .setEnd(endEventDateTime);
 
             Event updatedEvent = client.events().update("primary", eventId, event).execute();
             return ResponseEntity.ok(updatedEvent);

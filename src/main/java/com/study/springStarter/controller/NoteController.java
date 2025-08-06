@@ -260,7 +260,7 @@ public class NoteController {
             e.printStackTrace();
             reatt.addFlashAttribute("errorMessage", "노트 수정 중 오류가 발생했습니다.");
         }
-        return "redirect:/dashboard";
+        return "redirect:/note/view?noteId=" + note.getNoteId();
     }
 
     // 노트 삭제 처리

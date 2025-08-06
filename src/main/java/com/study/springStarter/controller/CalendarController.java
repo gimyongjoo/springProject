@@ -42,7 +42,7 @@ public class CalendarController {
     // google로부터 인증코드를 받아 처리하는 콜백 엔드포인트
     @GetMapping("/oauth2callback")
     public ModelAndView oauth2callback(@RequestParam(value = "code") String code, HttpSession session, HttpServletRequest req, RedirectAttributes reatt) {
-        ModelAndView mv = new ModelAndView("redirect:/dashboard2");
+        ModelAndView mv = new ModelAndView("redirect:/dashboard");
         String email = (String) session.getAttribute("email");
         if(email == null) {
             mv.setViewName("redirect:/login");
@@ -86,6 +86,6 @@ public class CalendarController {
             e.printStackTrace();
             session.setAttribute("errorMessage", "Google Calendar에 인증되지 않았습니다. 다시 연동해주세요.");
         }
-        return "redirect:/dashboard2";
+        return "redirect:/dashboard";
     }
 }

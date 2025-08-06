@@ -137,7 +137,7 @@ public class FolderController {
     }
 
     @PostMapping("/edit")
-    public String editFolder(@ModelAttribute Folder folder, HttpSession session, HttpServletRequest req, RedirectAttributes reatt) {
+    public String editFolder(@ModelAttribute Folder folder, Model m, HttpSession session, HttpServletRequest req, RedirectAttributes reatt) {
         String email = (String) session.getAttribute("email");
         if(!loginCheck(session)) {
             reatt.addFlashAttribute("errorMessage", "로그인 후 이용 가능합니다.");
@@ -165,6 +165,7 @@ public class FolderController {
             }
 
             folder.setUserId(user.getUserId());
+            m.addAttribute("folder", folder);
 
             int res = folderService.updateFolder(folder);
 

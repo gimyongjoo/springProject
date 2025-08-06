@@ -49,6 +49,7 @@ public class GoogleCalendarService {
                 .setAccessType("offline")
                 .setApprovalPrompt("force")
                 .build();
+
     }
 
     // 사용자 인증을 위한 URL을 생성

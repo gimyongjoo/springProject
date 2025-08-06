@@ -73,16 +73,16 @@
         </if>
         <choose>
             <when test="condition.sortBy == 'createdDate'">
-                ORDER BY createdDate
+                ORDER BY isPinned DESC, createdDate
             </when>
             <when test="condition.sortBy == 'updatedDate'">
-                ORDER BY updatedDate
+                ORDER BY isPinned DESC, updatedDate
             </when>
             <when test="condition.sortBy == 'title'">
-                ORDER BY title
+                ORDER BY isPinned DESC, title
             </when>
             <otherwise>
-                ORDER BY createdDate
+                ORDER BY isPinned DESC, createdDate
             </otherwise>
         </choose>
         <if test="condition.sortOrder == 'desc'">

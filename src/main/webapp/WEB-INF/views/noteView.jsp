@@ -303,6 +303,13 @@
         .checklist-input-group button:hover {
             background-color: #2980b9;
         }
+
+        .note-content img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 10px 0;
+        }
     </style>
 </head>
 <body>

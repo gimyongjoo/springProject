@@ -31,9 +31,10 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public String login(String email, String pwd, boolean rememberId, String toURL, HttpSession session, HttpServletResponse resp) {
+    public String login(String email, String pwd, boolean rememberId, String toURL, HttpSession session, HttpServletResponse resp, RedirectAttributes reatt) {
         toURL = "".equals(toURL) || toURL == null ? "/" : toURL;
         if(!isValid(email, pwd)) {
+            reatt.addFlashAttribute("errorMessage", "아이디나 비밀번호를 잘못 입력하셨습니다.");
             return "redirect:/login";
         }
         if(rememberId) {
