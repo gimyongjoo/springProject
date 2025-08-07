@@ -30,4 +30,7 @@ public interface NoteService {
     // 새롭게 추가된 메서드: 검색, 필터, 정렬 기능 포함
     List<Note> searchAndFilterAndSortNotes(int userId, NoteSearchCondition condition) throws Exception;
 
+    List<Note> search(NoteSearchCondition condition) throws Exception;
+
+    int count(NoteSearchCondition condition) throws Exception;
 }

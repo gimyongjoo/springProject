@@ -88,4 +88,14 @@ public class NoteServiceImpl implements NoteService {
         // 검색, 필터, 정렬 기능을 수행하는 Mapper 메서드 호출
         return noteMapper.searchAndFilterAndSortNotes(userId, condition);
     }
+
+    @Override
+    public List<Note> search(NoteSearchCondition condition) throws Exception {
+        return noteMapper.search(condition);
+    }
+
+    @Override
+    public int count(NoteSearchCondition condition) throws Exception {
+        return noteMapper.count(condition);
+    }
 }

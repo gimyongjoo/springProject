@@ -154,6 +154,20 @@
                         </div>
                     </div>
                 </c:if>
+                <div class="pagination mt-4">
+                    <c:if test="${ph.showPrev}">
+                        <a href="?page=${ph.beginPage - 1}&keyword=${condition.keyword}&folderId=${condition.folderId}">&laquo;</a>
+                    </c:if>
+
+                    <c:forEach begin="${ph.beginPage}" end="${ph.endPage}" var="i">
+                        <a href="?page=${i}&keyword=${condition.keyword}&folderId=${condition.folderId}"
+                           class="${condition.page == i ? 'active' : ''}">${i}</a>
+                    </c:forEach>
+
+                    <c:if test="${ph.showNext}">
+                        <a href="?page=${ph.endPage + 1}&keyword=${condition.keyword}&folderId=${condition.folderId}">&raquo;</a>
+                    </c:if>
+                </div>
             </div>
 
             <hr class="my-5">

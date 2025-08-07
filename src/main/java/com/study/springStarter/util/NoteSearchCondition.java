@@ -3,6 +3,8 @@ package com.study.springStarter.util;
 import java.util.Objects;
 
 public class NoteSearchCondition {
+    private int page = 1;
+    private int pageSize = 10;
     private String keyword;
     private Integer folderId;
     private Boolean isPinned;
@@ -20,6 +22,26 @@ public class NoteSearchCondition {
         this.isPinned = isPinned;
         this.sortBy = (sortBy != null && !sortBy.isEmpty()) ? sortBy : "createdDate";
         this.sortOrder = (sortOrder != null && !sortOrder.isEmpty()) ? sortOrder : "desc";
+    }
+
+    public int getOffset() {
+        return (page - 1) * pageSize;
+    }
+
+    public void setPage(int page) {
+        this.page = Math.max(1, page);
+    }
+
+    public void setPageSize(int pageSize) {
+        this.pageSize = Math.max(1, pageSize);
+    }
+
+    public int getPage() {
+        return page;
+    }
+
+    public int getPageSize() {
+        return pageSize;
     }
 
     public String getKeyword() {

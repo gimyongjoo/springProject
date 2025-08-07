@@ -93,4 +93,48 @@
         </if>
     </select>
 
+    <!-- 노트 목록 검색 + 페이징 -->
+    <select id="search" resultType="Note">
+        SELECT * FROM notes
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND title LIKE CONCAT('%', #{keyword}, '%')
+            </if>
+            <if test="folderId != null">
+                AND folder_id = #{folderId}
+            </if>
+            <!-- 다른 조건들... 예: 정렬, 고정 여부 등 -->
+            <!-- 예: 고정 여부 -->
+            <if test="pinned != null">
+                AND pinned = #{pinned}
+            </if>
+            <!-- 예: 날짜 범위 검색 -->
+            <if test="startDate != null and endDate != null">
+                AND created_at BETWEEN #{startDate} AND #{endDate}
+            </if>
+        </where>
+        ORDER BY id DESC
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <!-- 노트 목록 개수 조회 -->
+    <select id="count" resultType="int">
+        SELECT COUNT(*) FROM notes
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND title LIKE CONCAT('%', #{keyword}, '%')
+            </if>
+            <if test="folderId != null">
+                AND folder_id = #{folderId}
+            </if>
+            <!-- 동일 조건 반복 -->
+            <if test="pinned != null">
+                AND pinned = #{pinned}
+            </if>
+            <if test="startDate != null and endDate != null">
+                AND created_at BETWEEN #{startDate} AND #{endDate}
+            </if>
+        </where>
+    </select>
+
 </mapper>

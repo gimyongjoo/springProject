@@ -38,6 +38,9 @@ public interface NoteMapper {
     List<Note> searchAndFilterAndSortNotes(
             @Param("userId") int userId,
             @Param("condition") NoteSearchCondition condition
-    );
+    ) throws Exception;
 
+    List<Note> search(NoteSearchCondition condition) throws Exception;
+
+    int count(NoteSearchCondition condition) throws Exception;
 }
