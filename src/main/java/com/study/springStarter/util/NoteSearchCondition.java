@@ -6,10 +6,13 @@ public class NoteSearchCondition {
     private int page = 1;
     private int pageSize = 10;
     private String keyword;
+    private Integer userId;
     private Integer folderId;
     private Boolean isPinned;
     private String sortBy;
     private String sortOrder;
+    private String startDate;
+    private Integer offset;
 
     public NoteSearchCondition() {
         this.sortBy = "createdDate";
@@ -26,6 +29,34 @@ public class NoteSearchCondition {
 
     public int getOffset() {
         return (page - 1) * pageSize;
+    }
+
+    public void setOffset(Integer offset) {
+        this.offset = offset;
+    }
+
+    public Integer getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
+
+    public String getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(String startDate) {
+        this.startDate = startDate;
+    }
+
+    public Boolean getPinned() {
+        return isPinned;
+    }
+
+    public void setPinned(Boolean pinned) {
+        isPinned = pinned;
     }
 
     public void setPage(int page) {

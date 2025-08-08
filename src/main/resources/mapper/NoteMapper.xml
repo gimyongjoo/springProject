@@ -45,6 +45,7 @@
         select noteId, userId, folderId, title, content, isPinned,
                createdDate, updatedDate, markdown_enabled from note
         where userId = #{userId} and isPinned = true
+        ORDER BY updatedDate DESC, createdDate DESC
     </select>
 
     <update id="updateNote" parameterType="com.study.springStarter.dto.Note">
@@ -91,43 +92,43 @@
         <if test="condition.sortOrder == 'asc'">
             ASC
         </if>
+
+        LIMIT #{condition.offset}, #{condition.pageSize}
     </select>
 
     <!-- 노트 목록 검색 + 페이징 -->
     <select id="search" resultType="Note">
-        SELECT * FROM notes
+        SELECT * FROM note
         <where>
+            userId = #{userId}
             <if test="keyword != null and keyword != ''">
                 AND title LIKE CONCAT('%', #{keyword}, '%')
             </if>
             <if test="folderId != null">
-                AND folder_id = #{folderId}
+                AND folderId = #{folderId}
             </if>
-            <!-- 다른 조건들... 예: 정렬, 고정 여부 등 -->
-            <!-- 예: 고정 여부 -->
             <if test="pinned != null">
                 AND pinned = #{pinned}
             </if>
-            <!-- 예: 날짜 범위 검색 -->
             <if test="startDate != null and endDate != null">
                 AND created_at BETWEEN #{startDate} AND #{endDate}
             </if>
         </where>
-        ORDER BY id DESC
+        ORDER BY isPinned DESC, noteId DESC
         LIMIT #{offset}, #{pageSize}
     </select>
 
     <!-- 노트 목록 개수 조회 -->
     <select id="count" resultType="int">
-        SELECT COUNT(*) FROM notes
+        SELECT COUNT(*) FROM note
         <where>
+            userId = #{userId}
             <if test="keyword != null and keyword != ''">
                 AND title LIKE CONCAT('%', #{keyword}, '%')
             </if>
             <if test="folderId != null">
-                AND folder_id = #{folderId}
+                AND folderId = #{folderId}
             </if>
-            <!-- 동일 조건 반복 -->
             <if test="pinned != null">
                 AND pinned = #{pinned}
             </if>

@@ -365,7 +365,7 @@
             <button type="submit" class="btn btn-delete"
                     onclick="return confirm('정말 이 노트를 삭제하시겠습니까?');">삭제</button>
         </form>
-        <a href="<c:url value="/note/list?folderId=${note.folderId}" />" class="btn btn-secondary">대시보드로</a>
+        <a href="<c:url value='/note/list?page=${page}&folderId=${folderId}'/>" class="btn btn-secondary">목록으로</a>
     </div>
 
     <hr/>

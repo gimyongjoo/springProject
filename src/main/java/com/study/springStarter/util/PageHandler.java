@@ -35,7 +35,7 @@ public class PageHandler {
     }
 
     public int getPage() {
-        return page;
+        return Math.max(1, page);
     }
     // ※ setPage(), setPageSize() 후에는 doPaging()을 수동으로 반드시 다시 호출해야 함
     public void setPage(int page) {
@@ -43,7 +43,7 @@ public class PageHandler {
     }
 
     public int getPageSize() {
-        return pageSize;
+        return Math.max(1, pageSize);
     }
 
     public void setPageSize(int pageSize) {

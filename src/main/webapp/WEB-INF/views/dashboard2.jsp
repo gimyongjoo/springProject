@@ -65,6 +65,10 @@
             font-size: 0.7rem;
             line-height: 1.5;
         }
+
+        .pagination {
+            justify-content: center !important;
+        }
     </style>
 </head>
 <body>
@@ -121,7 +125,7 @@
             <div class="row row-cols-1 row-cols-md-2 g-4">
                 <c:forEach var="note" items="${notes}">
                     <div class="col">
-                        <div class="card h-100 note-card" onclick="location.href='<c:url value="/note/view?noteId=${note.noteId}"/>'">
+                        <div class="card h-100 note-card" onclick="location.href='<c:url value="/note/view?noteId=${note.noteId}&page=${condition.page}&folderId=${condition.folderId}"/>'">
                             <div class="card-body">
                                 <div class="note-card-header mb-2">
                                     <h5 class="card-title text-truncate me-2">${note.title}</h5>
@@ -154,24 +158,30 @@
                         </div>
                     </div>
                 </c:if>
-                <div class="pagination mt-4">
-                    <c:if test="${ph.showPrev}">
-                        <a href="?page=${ph.beginPage - 1}&keyword=${condition.keyword}&folderId=${condition.folderId}">&laquo;</a>
-                    </c:if>
+            </div> <!-- row-cols 닫는 div 위치 주의 -->
 
-                    <c:forEach begin="${ph.beginPage}" end="${ph.endPage}" var="i">
-                        <a href="?page=${i}&keyword=${condition.keyword}&folderId=${condition.folderId}"
-                           class="${condition.page == i ? 'active' : ''}">${i}</a>
-                    </c:forEach>
-
-                    <c:if test="${ph.showNext}">
-                        <a href="?page=${ph.endPage + 1}&keyword=${condition.keyword}&folderId=${condition.folderId}">&raquo;</a>
-                    </c:if>
-                </div>
+            <div class="text-center mt-4">
+                <nav class="d-inline-block">
+                    <ul class="pagination justify-content-center">
+                        <c:if test="${ph.showPrev}">
+                            <li class="page-item">
+                                <a class="page-link" href="?page=${ph.beginPage - 1}&keyword=${condition.keyword}&folderId=${condition.folderId}">&laquo;</a>
+                            </li>
+                        </c:if>
+                        <c:forEach begin="${ph.beginPage}" end="${ph.endPage}" var="i">
+                            <li class="page-item ${condition.page == i ? 'active' : ''}">
+                                <a class="page-link" href="?page=${i}&keyword=${condition.keyword}&folderId=${condition.folderId}">${i}</a>
+                            </li>
+                        </c:forEach>
+                        <c:if test="${ph.showNext}">
+                            <li class="page-item">
+                                <a class="page-link" href="?page=${ph.endPage + 1}&keyword=${condition.keyword}&folderId=${condition.folderId}">&raquo;</a>
+                            </li>
+                        </c:if>
+                    </ul>
+                </nav>
             </div>
-
             <hr class="my-5">
-
             <h2 class="mb-4">내 캘린더</h2>
             <div class="row justify-content-center">
                 <div class="col-md-10">
@@ -180,7 +190,6 @@
             </div>
         </div>
     </div>
-</div>
 <!-- 일정 추가 모달 -->
 <div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
     <div class="modal-dialog">

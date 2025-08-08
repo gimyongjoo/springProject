@@ -74,27 +74,27 @@ public class NoteController {
             return "redirect:/login";
         }
 
-        List<Note> notes;
         try {
+            condition.setUserId(user.getUserId());
+
             // condition에 folderId가 있으면 설정해줍니다.
             if (folderId != null) {
                 condition.setFolderId(folderId);
             }
 
-            // 새로운 서비스 메서드를 호출하여 검색/필터/정렬 기능을 통합
-            notes = noteService.searchAndFilterAndSortNotes(user.getUserId(), condition);
 
             // paging 정보 계산 및 전달
             int totalCnt = noteService.count(condition);
             PageHandler ph = new PageHandler(totalCnt, condition.getPage(), condition.getPageSize());
-            notes = noteService.search(condition);
+            condition.setOffset(ph.getOffset());
+            
+            List<Note> notes = noteService.search(condition);
 
             m.addAttribute("notes", notes);
             m.addAttribute("condition", condition); // 검색 조건을 JSP로 전달
             m.addAttribute("folders", folderService.findFoldersByUserId(user.getUserId()));
             m.addAttribute("user", user);
             m.addAttribute("ph", ph);
-
         } catch (Exception e) {
             e.printStackTrace();
             reatt.addFlashAttribute("errorMessage", "노트 목록 조회 중 오류가 발생했습니다.");
@@ -161,7 +161,11 @@ public class NoteController {
 
     // 노트 상세 조회
     @GetMapping("/view")
-    public String viewNote(@RequestParam("noteId") int noteId, Model m, HttpSession session, RedirectAttributes reatt) {
+    public String viewNote(
+            @RequestParam("noteId") int noteId,
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "folderId", required = false) Integer folderId,
+            Model m, HttpSession session, RedirectAttributes reatt) {
         String email = (String) session.getAttribute("email");
         if (!loginCheck(session)) {
             reatt.addFlashAttribute("errorMessage", "로그인 후 이용 가능합니다.");
@@ -194,6 +198,8 @@ public class NoteController {
             m.addAttribute("note", note);
             m.addAttribute("checklists", checkListService.findChecklistsByNoteId(noteId, user.getUserId())); // userId 추가
             m.addAttribute("user", user);
+            m.addAttribute("folderId", folderId);
+            m.addAttribute("page", page);
             return "noteView";
         } catch (IllegalArgumentException e) {
             reatt.addFlashAttribute("errorMessage", e.getMessage());

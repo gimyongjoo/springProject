@@ -21,8 +21,6 @@ import java.io.UnsupportedEncodingException;
 public class UserController {
 
     @Autowired
-    UserService service;
-    @Autowired
     private UserService userService;
 
     @GetMapping("/login")
@@ -53,7 +51,7 @@ public class UserController {
     private boolean isValid(String email, String pwd) {
         User user = null;
         try {
-            user = service.findByEmail(email);
+            user = userService.findByEmail(email);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -78,16 +76,16 @@ public class UserController {
     @PostMapping("/register/save")
     public String register(User user, RedirectAttributes reatt) throws UnsupportedEncodingException {
         try {
-            if(service.countByEmail(user.getEmail()) > 0) {
+            if(userService.countByEmail(user.getEmail()) > 0) {
                 reatt.addFlashAttribute("errorMessage", "이미 사용중인 이메일입니다.");
                 return "redirect:/register/add";
             }
-            if(service.countByName(user.getName()) > 0) {
+            if(userService.countByName(user.getName()) > 0) {
                 reatt.addFlashAttribute("errorMessage", "이미 사용중인 닉네임입니다.");
                 return "redirect:/register/add";
             }
 
-            int res = service.register(user);
+            int res = userService.register(user);
 
             if(res == 1) {
                 System.out.println("회원가입 성공");
