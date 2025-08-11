@@ -28,10 +28,7 @@
         }
 
         h2 {
-            color: #2c3e50;
-            border-bottom: 2px solid #e0e0e0;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
+
         }
 
         h3 {
@@ -55,6 +52,13 @@
 
         .note-info span {
             margin-right: 15px;
+        }
+
+        .note-title {
+            color: #2c3e50;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
         }
 
         .note-content {
@@ -326,7 +330,7 @@
         </script>
     </c:if>
 
-    <h2>${note.title}</h2>
+    <h2 class="note-title">${note.title}</h2>
 
     <div class="note-info">
         <span>
