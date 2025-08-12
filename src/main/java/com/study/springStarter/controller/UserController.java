@@ -8,6 +8,8 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,8 +22,14 @@ import java.io.UnsupportedEncodingException;
 @Controller
 public class UserController {
 
-    @Autowired
     private UserService userService;
+    private final PasswordEncoder passwordEncoder;
+
+    @Autowired
+    public UserController(UserService userService, PasswordEncoder passwordEncoder) {
+        this.userService = userService;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @GetMapping("/login")
     public String login() {
@@ -48,18 +56,32 @@ public class UserController {
         return "redirect:" + toURL;
     }
 
+//    private boolean isValid(String email, String pwd) {
+//        User user = null;
+//        try {
+//            user = userService.findByEmail(email);
+//            if(user==null) return false;
+//            System.out.println(user+ " "+ passwordEncoder.matches(pwd, user.getPwd()));
+//            return user.getEmail().equals(email) && (user.getPwd().equals(pwd) || passwordEncoder.matches(pwd, user.getPwd()));
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//
+//        return false;
+////        return user.getEmail().equals(email) && user.getPwd().equals(pwd);
+//    }
+
     private boolean isValid(String email, String pwd) {
-        User user = null;
         try {
-            user = userService.findByEmail(email);
+            User user = userService.findByEmail(email);
+            if(user != null && ( user.getPwd().equals(pwd) || passwordEncoder.matches(pwd, user.getPwd()))) return true;
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if(user == null) {
-            return false;
-        }
-        return user.getEmail().equals(email) && user.getPwd().equals(pwd);
+        return false;
     }
+
 
     @GetMapping("/logout")
     public String logout(HttpSession session) {
@@ -74,8 +96,12 @@ public class UserController {
     }
 
     @PostMapping("/register/save")
-    public String register(User user, RedirectAttributes reatt) throws UnsupportedEncodingException {
+    public String register(String email, User user, RedirectAttributes reatt) throws UnsupportedEncodingException {
         try {
+            if(!isValidEmail(email)) {
+                reatt.addFlashAttribute("errorMessage", "이메일 형식에 맞춰주시기 바랍니다.");
+                return "redirect:/register/add";
+            }
             if(userService.countByEmail(user.getEmail()) > 0) {
                 reatt.addFlashAttribute("errorMessage", "이미 사용중인 이메일입니다.");
                 return "redirect:/register/add";
@@ -102,6 +128,11 @@ public class UserController {
             reatt.addFlashAttribute("errorMessage", "서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
             return "redirect:/register/add";
         }
+    }
+
+    private boolean isValidEmail(String email) {
+        String emailRegex = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
+        return email.matches(emailRegex);
     }
 
     @ResponseBody

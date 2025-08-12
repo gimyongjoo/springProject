@@ -4,6 +4,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🗒️</text></svg>">
     <title>로그인</title>
     <style>
         /* 기본 스타일 - 다른 JSP 파일들과 일관성 유지 */
@@ -27,11 +28,12 @@
         }
 
         h2 {
-            color: #2c3e50;
-            border-bottom: 2px solid #e0e0e0;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
             text-align: center;
+            color: #2d3436;
+            margin-bottom: 36px;
+            font-size: 2em;
+            font-weight: 700;
+            letter-spacing: 1px;
         }
 
         /* 폼 스타일 */
@@ -141,11 +143,9 @@
         </script>
     </c:if>
     <c:if test="${not empty successMessage}">
-        <div class="message-box success-message">
             <script>
                 alert("${successMessage}");
             </script>
-        </div>
     </c:if>
     <h2>로그인</h2>
     <form action="<c:url value="/login" />" method="post" onsubmit="return formCheck(this)">
