@@ -32,7 +32,7 @@ public class NoteController {
 
     private final NoteService noteService;
     private final UserService userService;
-    private final CheckListService checkListService;
+//    private final CheckListService checkListService;
     private final ImageService imageService;
     private final TodoService todoService;
     private final FolderService folderService;
@@ -41,10 +41,10 @@ public class NoteController {
     private String uploadDir;
 
     @Autowired
-    public NoteController(NoteService noteService, UserService userService, CheckListService checkListService, ImageService imageService, TodoService todoService, FolderService folderService) {
+    public NoteController(NoteService noteService, UserService userService, ImageService imageService, TodoService todoService, FolderService folderService) {
         this.noteService = noteService;
         this.userService = userService;
-        this.checkListService = checkListService;
+//        this.checkListService = checkListService;
         this.imageService = imageService;
         this.todoService = todoService;
         this.folderService = folderService;
@@ -196,7 +196,7 @@ public class NoteController {
             m.addAttribute("htmlContent", htmlContent);
             m.addAttribute("todos", todos);
             m.addAttribute("note", note);
-            m.addAttribute("checklists", checkListService.findChecklistsByNoteId(noteId, user.getUserId())); // userId 추가
+//            m.addAttribute("checklists", checkListService.findChecklistsByNoteId(noteId, user.getUserId())); // userId 추가
             m.addAttribute("user", user);
             m.addAttribute("folderId", folderId);
             m.addAttribute("page", page);
