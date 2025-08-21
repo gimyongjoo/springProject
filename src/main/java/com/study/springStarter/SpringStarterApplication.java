@@ -6,7 +6,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @SpringBootApplication
-@MapperScan(basePackages = "com.study.springStarter.mapper")
+@MapperScan(basePackages = {
+		"com.study.springStarter.mapper",
+		"com.study.springStarter.board"})
 public class SpringStarterApplication {
 
 	public static void main(String[] args) {
