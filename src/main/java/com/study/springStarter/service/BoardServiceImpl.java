@@ -2,6 +2,7 @@ package com.study.springStarter.service;
 
 import com.study.springStarter.mapper.BoardMapper;
 import com.study.springStarter.dto.BoardDto;
+import com.study.springStarter.util.SearchCondition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,8 +34,8 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public int modify(BoardDto dto) throws Exception {
-        return boardMapper.update(dto);
+    public int modify(BoardDto dto, String writer) throws Exception {
+        return boardMapper.update(dto, writer);
     }
 
     @Override
@@ -49,6 +50,21 @@ public class BoardServiceImpl implements BoardService {
     @Override
     public List<BoardDto> selectAll() throws Exception {
         return boardMapper.selectAll();
+    }
+
+    @Override
+    public int getSearchResultCnt(SearchCondition sc) throws Exception {
+        return boardMapper.searchResultCnt(sc);
+    }
+
+    @Override
+    public List<BoardDto> getSearchResultPage(SearchCondition sc) throws Exception {
+        return boardMapper.searchSelectPage(sc);
+    }
+
+    @Override
+    public List<BoardDto> getPage(Integer offset, Integer pageSize) throws Exception {
+        return boardMapper.selectPage(offset, pageSize);
     }
 
 }

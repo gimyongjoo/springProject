@@ -26,7 +26,7 @@
         <!-- 상단 메타 -->
         <div class="card mb-3">
             <div class="card-body">
-                <h3 class="card-title mb-3">${dto.bno}</h3>
+                <h3 class="card-title mb-3">${dto.title}</h3>
                 <div class="d-flex flex-wrap gap-3 text-muted small">
                     <div>작성자: <strong>${dto.writer}</strong></div>
 
@@ -63,48 +63,19 @@
 
     <!-- 버튼들 -->
     <div class="d-flex gap-2 justify-content-end mb-5">
-        <a class="btn btn-secondary" href="<c:url value='/board/list'/>">목록</a>
-        <a class="btn btn-primary" href="<c:url value='/edit?bno=${dto.bno}'/>">수정</a>
-        <form action="<c:url value='/delete'/>" method="post" onsubmit="return confirm('삭제할까요?');">
-            <input type="hidden" name="bno" value="${dto.bno}">
-            <button type="submit" class="btn btn-danger">삭제</button>
-        </form>
-    </div>
-
-    <!-- 댓글 영역 (원하면 나중에 컨트롤러/서비스 연결) -->
-    <div class="card">
-        <div class="card-header">댓글</div>
-        <div class="card-body">
-            <c:if test="${empty comments}">
-                <div class="text-muted">등록된 댓글이 없습니다.</div>
-            </c:if>
-            <c:forEach var="cmt" items="${comments}">
-                <div class="border-bottom py-2">
-                    <div class="d-flex justify-content-between">
-                        <strong>${cmt.commenter}</strong>
-                        <c:if test="${not empty cmt.regDate}">
-                            <fmt:parseDate value="${cmt.regDate}" pattern="yyyy-MM-dd'T'HH:mm:ss" var="cRegDateObj"/>
-                            <span class="text-muted small">
-                                <fmt:formatDate value="${cRegDateObj}" pattern="yyyy-MM-dd HH:mm"/>
-                            </span>
-                        </c:if>
-                    </div>
-                    <div class="mt-1" style="white-space:pre-wrap; word-break:break-word;">
-                        <c:out value="${cmt.comment}" />
-                    </div>
-                </div>
-            </c:forEach>
-
-            <!-- 댓글 작성 폼(로그인 체크는 서버에서) -->
-            <form class="mt-3" action="<c:url value='/comment/add'/>" method="post">
-                <input type="hidden" name="bno" value="${board.bno}">
-                <textarea class="form-control mb-2" name="comment" rows="3" placeholder="댓글을 입력하세요" required></textarea>
-                <div class="text-end">
-                    <button type="submit" class="btn btn-primary">댓글 등록</button>
-                </div>
+        <a class="btn btn-secondary" href="<c:url value='/board/list${sc.queryString}'/>">목록</a>
+        <c:if test="${sessionScope.email eq dto.writer}">
+            <a class="btn btn-primary" href="<c:url value='/board/modify?bno=${dto.bno}'/>">수정</a>
+            <form action="<c:url value='/board/remove'/>" method="post" onsubmit="return confirm('삭제할까요?');">
+                <input type="hidden" name="bno" value="${dto.bno}">
+                <button type="submit" class="btn btn-danger">삭제</button>
             </form>
-        </div>
+        </c:if>
     </div>
+
+    <jsp:include page="comment.jsp">
+        <jsp:param name="bno" value="${dto.bno}"/>
+    </jsp:include>
 </div>
 </body>
 </html>

@@ -31,68 +31,57 @@
 
     <!-- 작성/수정 메타 -->
     <div class="mb-3 text-muted">
-        <c:if test="${not empty board.regDate}">
+        <c:if test="${not empty dto.regDate}">
             <%-- LocalDateTime을 출력용으로 포맷 --%>
-            <fmt:parseDate value="${board.regDate}" pattern="yyyy-MM-dd'T'HH:mm:ss" var="regDateObj"/>
+            <fmt:parseDate value="${dto.regDate}" pattern="yyyy-MM-dd'T'HH:mm:ss" var="regDateObj"/>
             <span>작성일:
                 <fmt:formatDate value="${regDateObj}" pattern="yyyy-MM-dd HH:mm"/>
             </span>
         </c:if>
-        <c:if test="${not empty board.modiDate}">
-            <fmt:parseDate value="${board.modiDate}" pattern="yyyy-MM-dd'T'HH:mm:ss" var="modiDateObj"/>
+        <c:if test="${not empty dto.modiDate}">
+            <fmt:parseDate value="${dto.modiDate}" pattern="yyyy-MM-dd'T'HH:mm:ss" var="modiDateObj"/>
             <span class="ms-3">수정일:
                 <fmt:formatDate value="${modiDateObj}" pattern="yyyy-MM-dd HH:mm"/>
             </span>
         </c:if>
-        <span class="ms-3">조회수: ${board.viewCnt}</span>
+        <span class="ms-3">조회수: ${dto.viewCnt}</span>
     </div>
 
     <!-- 수정 폼 -->
-    <form action="<c:url value='/modify'/>" method="post" id="modifyForm">
+    <form action="<c:url value='/board/modify'/>" method="post" id="modifyForm">
         <!-- Spring Security CSRF (사용 중일 때) -->
         <c:if test="${not empty _csrf}">
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
         </c:if>
 
         <!-- 글 번호 (숨김) -->
-        <input type="hidden" name="bno" value="${board.bno}"/>
+        <input type="hidden" name="bno" value="${dto.bno}"/>
 
         <div class="mb-3">
             <label for="title" class="form-label">제목</label>
             <input type="text" id="title" name="title" class="form-control"
-                   value="${board.title}" maxlength="100" required>
+                   value="${dto.title}" maxlength="100" required>
             <div class="count mt-1"><span id="titleCount">0</span>/100</div>
         </div>
 
         <div class="mb-3">
             <label for="writer" class="form-label">작성자</label>
             <!-- 작성자는 보통 수정 불가로 둠 -->
-            <input type="text" id="writer" name="writer" class="form-control" value="${board.writer}" readonly>
+            <input type="text" id="writer" name="writer" class="form-control" value="${dto.writer}" readonly>
         </div>
 
         <div class="mb-3">
             <label for="content" class="form-label">내용</label>
-            <textarea id="content" name="content" class="form-control" rows="12" required>${board.content}</textarea>
+            <textarea id="content" name="content" class="form-control" rows="12" required>${dto.content}</textarea>
         </div>
 
         <div class="d-flex gap-2 justify-content-end">
             <a class="btn btn-secondary"
-               href="<c:url value='/view?bno=${board.bno}'/>">취소</a>
+               href="<c:url value='/board/view?bno=${dto.bno}'/>">취소</a>
             <button type="submit" class="btn btn-primary">수정 저장</button>
         </div>
     </form>
 
-    <!-- 필요 시 삭제 버튼도 여기 배치 (선택) -->
-    <!--
-    <form action="<c:url value='/delete'/>" method="post" class="mt-2 text-end"
-          onsubmit="return confirm('정말 삭제할까요?');">
-        <input type="hidden" name="bno" value="${board.bno}">
-        <c:if test="${not empty _csrf}">
-            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
-        </c:if>
-        <button type="submit" class="btn btn-delete text-white">삭제</button>
-    </form>
-    -->
 </div>
 
 <script>

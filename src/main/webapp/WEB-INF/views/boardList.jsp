@@ -8,6 +8,23 @@
     <meta charset="UTF-8">
     <title>게시판 목록</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .text-start a {
+            color: black;
+            text-decoration: none;
+        }
+        .text-start a:hover {
+            text-decoration: underline;
+        }
+        small {
+            color: red;
+        }
+
+        #page{ display:flex; gap:.25rem; justify-content:center; margin:1rem 0; }
+        #page a{ padding:.25rem .5rem; border:1px solid #dee2e6; border-radius:.25rem; text-decoration:none; color:#0d6efd; }
+        #page a.active{ background:#0d6efd; color:#fff; }
+        #page a.step{ font-weight:600; }
+    </style>
 </head>
 <body>
 <%@ include file="navi.jsp"%>
@@ -25,8 +42,21 @@
 <div class="container mt-5">
     <h2 class="mb-4">게시판 목록</h2>
 
-    <div class="mb-3 text-end">
-        <a href="writeForm.jsp" class="btn btn-primary">글쓰기</a>
+    <div class="d-flex justify-content-end mb-3">
+        <!-- 검색 폼 -->
+        <form class="d-flex" method="get" action="<c:url value='/board/list'/>">
+            <select name="option" class="form-select form-select-sm me-2" style="width: 100px;">
+                <option value="T" ${param.option eq 'T' ? 'selected' : ''}>제목</option>
+                <option value="W" ${param.option eq 'W' ? 'selected' : ''}>작성자</option>
+                <option value="A" ${param.option eq 'A' ? 'selected' : ''}>제목+내용</option>
+            </select>
+            <input type="text" name="keyword" class="form-control form-control-sm me-2"
+                   placeholder="검색어" style="width: 200px;" required value="${not empty param.keyword ? param.keyword : ''}">
+            <button type="submit" class="btn btn-secondary btn-sm me-2">검색</button>
+        </form>
+
+        <!-- 글쓰기 버튼 -->
+        <a href="<c:url value='/board/write'/>" class="btn btn-primary btn-sm">글쓰기</a>
     </div>
 
     <table class="table table-bordered table-hover text-center align-middle">
@@ -44,7 +74,11 @@
             <tr>
                 <td>${board.bno}</td>
                 <td class="text-start">
-                    <a href="<c:url value='/board/view?bno=${board.bno}'/>">${board.title}</a>
+                    <a href="<c:url value='/board/view${ph.sc.queryString}&bno=${board.bno}'/>">${board.title}
+                    <c:if test="${board.commentCnt ne 0}">
+                        <small>(<c:out value="${board.commentCnt}"/>)</small>
+                    </c:if>
+                    </a>
                 </td>
                 <td>${board.writer}</td>
                 <td>
@@ -76,21 +110,17 @@
         </tbody>
     </table>
 
-    <nav>
-        <ul class="pagination justify-content-center">
-            <li class="page-item <c:if test='${page==1}'>disabled</c:if>'">
-                <a class="page-link" href="?page=${page-1}">이전</a>
-            </li>
-            <c:forEach begin="1" end="${totalPages}" var="p">
-                <li class="page-item <c:if test='${p==page}'>active</c:if>'">
-                    <a class="page-link" href="?page=${p}">${p}</a>
-                </li>
-            </c:forEach>
-            <li class="page-item <c:if test='${page==totalPages}'>disabled</c:if>'">
-                <a class="page-link" href="?page=${page+1}">다음</a>
-            </li>
-        </ul>
-    </nav>
+    <div id="page">
+        <c:if test="${ph.showPrev}">
+            <a class="step" href="<c:url value="/board/list${ph.sc.getQueryString(ph.beginPage - 1)}"/> ">&lt;</a>
+        </c:if>
+        <c:forEach begin="${ph.beginPage}" end="${ph.endPage}" var="i">
+            <a class="${i == ph.sc.page ? 'active' : ''}" href="<c:url value="/board/list${ph.sc.getQueryString(i)}"/> ">${i}</a>
+        </c:forEach>
+        <c:if test="${ph.showNext}">
+            <a class="step" href="<c:url value="/board/list${ph.sc.getQueryString(ph.endPage + 1)}"/> ">&gt;</a>
+        </c:if>
+    </div>
 </div>
 </body>
 </html>
