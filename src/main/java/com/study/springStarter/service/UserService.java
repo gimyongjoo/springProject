@@ -14,4 +14,6 @@ public interface UserService {
 
     int countByName(String name) throws Exception;
 
+    int updatePasswordByEmail(String email, String encodedPwd) throws Exception;
+
 }

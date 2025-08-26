@@ -11,13 +11,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.UnsupportedEncodingException;
+import java.util.UUID;
 
 @Controller
 public class UserController {
@@ -97,6 +96,14 @@ public class UserController {
 
     @PostMapping("/register/save")
     public String register(String email, User user, RedirectAttributes reatt) throws UnsupportedEncodingException {
+        if (user.getName() != null) {
+            user.setName(user.getName().trim());
+        }
+        if (user.getName() == null || !user.getName().matches("^[A-Za-z가-힣]+$")) {
+            reatt.addFlashAttribute("errorMessage", "이름은 한글/영문만 가능합니다.");
+            return "redirect:/register/add";
+        }
+
         try {
             if(!isValidEmail(email)) {
                 reatt.addFlashAttribute("errorMessage", "이메일 형식에 맞춰주시기 바랍니다.");
@@ -108,6 +115,10 @@ public class UserController {
             }
             if(userService.countByName(user.getName()) > 0) {
                 reatt.addFlashAttribute("errorMessage", "이미 사용중인 닉네임입니다.");
+                return "redirect:/register/add";
+            }
+            if(user.getPwd().length() < 6 || user.getPwd().length() > 20 ) {
+                reatt.addFlashAttribute("errorMessage", "비밀번호는 6~20 이내로 입력해주세요.");
                 return "redirect:/register/add";
             }
 
@@ -127,6 +138,73 @@ public class UserController {
             System.out.println("회원가입 중 예외 발생: " + e.getMessage());
             reatt.addFlashAttribute("errorMessage", "서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
             return "redirect:/register/add";
+        }
+    }
+
+    @GetMapping("/register/pwdFind")
+    public String pwdFind() {
+        return "pwdFind";
+    }
+
+    @PostMapping("/register/pwdFind")
+    public String pwdFind(String email, String name, Model m, HttpSession session, RedirectAttributes reatt) {
+        try {
+            User user = userService.findByEmail(email);
+            if(user == null) {
+                reatt.addFlashAttribute("errorMessage","등록되지 않은 이메일입니다.");
+                return "redirect:/register/pwdFind";
+            }
+            if(!user.getName().equals(name)){
+                reatt.addFlashAttribute("errorMessage","이메일과 이름이 일치하지 않습니다.");
+                return "redirect:/register/pwdFind";
+            }
+            String token = UUID.randomUUID().toString();
+            session.setAttribute("RESET_TOKEN", token);
+            session.setAttribute("RESET_EMAIL", email);
+
+            m.addAttribute("resetToken", token);
+            m.addAttribute("email", email);
+
+            return "pwdFind";
+        } catch (Exception e) {
+            e.printStackTrace();
+            reatt.addFlashAttribute("errorMessage","서버 오류가 발생했습니다.");
+            return "redirect:/register/pwdFind";
+        }
+    }
+
+    @PostMapping("/register/pwdReset")
+    public String pwdReset(String email, String token, @RequestParam("pwd") String newPwd,
+                           @RequestParam("pwdConfirm") String newPwdConfirm, HttpSession session, RedirectAttributes reatt) {
+        try {
+            String sessionToken = (String)session.getAttribute("RESET_TOKEN");
+            String sessionEmail = (String)session.getAttribute("RESET_EMAIL");
+
+            if(sessionToken == null || !sessionToken.equals(token) || sessionEmail == null || !sessionEmail.equals(email)) {
+                reatt.addFlashAttribute("errorMessage", "재설정 절차가 유효하지 않습니다. 처음부터 다시 시도해주세요.");
+                return "redirect:/register/pwdFind";
+            }
+            if(newPwd == null || newPwd.length() < 6 || newPwd.length() > 20) {
+                reatt.addFlashAttribute("errorMessage", "비밀번호는 6~20자로 입력해주세요.");
+                return "redirect:/register/pwdFind";
+            }
+            if(!newPwd.equals(newPwdConfirm)) {
+                reatt.addFlashAttribute("errorMessage","비밀번호 확인이 일치하지 않습니다.");
+                return "redirect:/register/pwdFind";
+            }
+
+            String encoded = passwordEncoder.encode(newPwd);
+            userService.updatePasswordByEmail(email, encoded);
+
+            session.removeAttribute("RESET_TOKEN");
+            session.removeAttribute("RESET_EMAIL");
+
+            reatt.addFlashAttribute("successMessage","비밀번호가 변경되었습니다. 새 비밀번호로 로그인하세요.");
+            return "redirect:/login";
+        } catch (Exception e) {
+            e.printStackTrace();
+            reatt.addFlashAttribute("errorMessage","서버 오류가 발생했습니다.");
+            return "redirect:/register/pwdFind";
         }
     }
 

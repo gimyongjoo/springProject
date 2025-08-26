@@ -15,4 +15,6 @@ public interface UserMapper {
 
     int countByName(String name) throws Exception; // 닉네임 중복 체크
 
+    int updatePasswordByEmail(String email, String pwd) throws Exception;
+
 }

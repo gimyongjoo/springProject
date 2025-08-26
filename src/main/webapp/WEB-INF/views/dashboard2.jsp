@@ -70,6 +70,37 @@
         .pagination {
             justify-content: center !important;
         }
+        /* 모바일(<=576px)에서 입력/버튼 가로 100%, 헤더 스택 */
+        @media (max-width: 576px) {
+            /* 상단 제목+버튼 줄을 세로로 쌓고 꽉 차게 */
+            .d-flex.justify-content-between.align-items-center.mb-4 {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: .5rem;
+            }
+
+            /* 모든 기본 입력/셀렉트/버튼 100% */
+            .btn,
+            .form-control,
+            .form-select,
+            input[type="text"],
+            input[type="email"],
+            input[type="password"],
+            input[type="datetime-local"] {
+                width: 100% !important;
+            }
+
+            /* 사이드바는 고정 해제(스크롤 불편 방지) */
+            .sidebar {
+                position: static;
+                height: auto;
+            }
+
+            /* 폴더 항목의 버튼 그룹 간격 살짝 */
+            .folder-actions {
+                gap: .25rem;
+            }
+        }
     </style>
 </head>
 <body>

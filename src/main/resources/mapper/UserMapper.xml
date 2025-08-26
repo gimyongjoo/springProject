@@ -23,4 +23,10 @@
         select count(*) from user where name = #{name}
     </select>
 
+    <update id="updatePasswordByEmail">
+        UPDATE user
+        SET pwd = #{pwd}
+        WHERE email = #{email}
+    </update>
+
 </mapper>

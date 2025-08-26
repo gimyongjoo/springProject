@@ -45,4 +45,9 @@ public class UserServiceImpl implements UserService {
         return mapper.countByName(name);
     }
 
+    @Override
+    public int updatePasswordByEmail(String email, String encodedPwd) throws Exception {
+        return mapper.updatePasswordByEmail(email, encodedPwd);
+    }
+
 }

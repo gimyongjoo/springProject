@@ -154,7 +154,7 @@
         <div class="message success">${successMessage}</div>
     </c:if>
 
-    <form id="registerForm" method="post" action="<c:url value='/register/save'/>">
+    <form id="registerForm" method="post" action="<c:url value='/register/save'/>" onsubmit="return validateFrm()">
         <div class="form-group" style="position:relative;">
             <label for="email">이메일</label>
             <div style="display:flex; gap:8px;">
@@ -168,6 +168,11 @@
             <input type="password" id="pwd" name="pwd" required placeholder="비밀번호 입력" minlength="6" maxlength="20" />
         </div>
         <div class="form-group">
+            <label for="pwdConfirm">비밀번호 확인</label>
+            <input type="password" id="pwdConfirm" name="pwdConfirm" required placeholder="비밀번호 확인 입력" minlength="6" maxlength="20" />
+            <small id="password-match-message"></small>
+        </div>
+        <div class="form-group">
             <label for="name">닉네임</label>
             <input type="text" id="name" name="name" required placeholder="닉네임 입력" maxlength="16" />
         </div>
@@ -179,6 +184,50 @@
 </div>
 <script src="http://code.jquery.com/jquery-latest.js"></script>
 <script>
+    function validateFrm() {
+        const email = document.getElementById('email');
+        const password = document.getElementById('pwd').value;
+        const confirmPassword = document.getElementById('pwdConfirm').value;
+
+        if (!email.readOnly) {
+            alert('이메일 중복확인을 해주세요.');
+            email.focus();
+            return false;
+        }
+
+        if(password !== confirmPassword) {
+            alert('비밀번호가 일치하지 않습니다.');
+            return false;
+        }
+
+        return true;
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const password = document.getElementById('pwd');
+        const confirmPassword = document.getElementById('pwdConfirm');
+        const message = document.getElementById('password-match-message');
+
+        function validatePassword() {
+            if (password.value === confirmPassword.value) {
+                message.textContent = '비밀번호가 일치합니다.';
+                message.style.color = 'green';
+            } else {
+                message.textContent = '비밀번호가 일치하지 않습니다.';
+                message.style.color = 'red';
+            }
+
+            if (!password.value || !confirmPassword.value) {
+                message.textContent = '';
+                return;
+            }
+        }
+
+        // 두 입력 필드에 이벤트 리스너 추가
+        password.addEventListener('input', validatePassword);
+        confirmPassword.addEventListener('input', validatePassword);
+    });
+
     // 이 스크립트 블록은 원본에서 변경하지 않았습니다.
     function idcheck(){
         let email = document.querySelector("#email")

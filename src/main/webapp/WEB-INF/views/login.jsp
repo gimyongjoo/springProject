@@ -81,12 +81,18 @@
         }
 
         /* 하단 링크 및 체크박스 스타일 */
-        .form-options {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 15px;
-            font-size: 0.9em;
+        .form-options{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-top:15px;
+            font-size:0.9em;
+        }
+
+
+        .form-options .right-links{
+            display:flex;
+            gap:12px;
         }
 
         .form-options label {
@@ -99,16 +105,16 @@
             margin-right: 5px;
         }
 
-        .form-options a {
-            color: #3498db;
-            text-decoration: none;
-            font-weight: bold;
-            transition: color 0.3s ease;
+        .form-options a{
+            color:#3498db;
+            text-decoration:none;
+            font-weight:bold;
+            transition:color .3s ease;
         }
 
-        .form-options a:hover {
-            color: #2980b9;
-            text-decoration: underline;
+        .form-options a:hover{
+            color:#2980b9;
+            text-decoration:underline;
         }
 
         /* 메시지 스타일 */
@@ -168,7 +174,10 @@
             <label>
                 <input type="checkbox" name="rememberId" ${empty cookie.email.value? "" : "checked"}>아이디 기억
             </label>
-            <a href="<c:url value='/register/add'/>">회원가입</a>
+            <div class="right-links">
+                <a href="<c:url value='/register/pwdFind'/>">비밀번호찾기</a>
+                <a href="<c:url value='/register/add'/>">회원가입</a>
+            </div>
         </div>
     </form>
 </div>
