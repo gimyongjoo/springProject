@@ -9,6 +9,10 @@
     <title>게시판 목록</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        h2 a {
+            text-decoration: none;
+            color: black;
+        }
         .text-start a {
             color: black;
             text-decoration: none;
@@ -40,7 +44,9 @@
     </script>
 </c:if>
 <div class="container mt-5">
-    <h2 class="mb-4">게시판 목록</h2>
+    <h2 class="mb-4">
+        <a href="<c:url value="/board/list"/>">게시판 목록</a>
+    </h2>
 
     <div class="d-flex justify-content-end mb-3">
         <!-- 검색 폼 -->
