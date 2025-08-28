@@ -115,9 +115,16 @@ public class NoteController {
 
     // 노트 추가 폼
     @GetMapping("/add")
-    public String addNoteForm(@RequestParam(value = "folderId", required = false) Integer folderId, Model m) {
+    public String addNoteForm(@RequestParam(value = "folderId", required = false) Integer folderId, Model m, HttpSession session) {
         Note note = new Note();
         note.setFolderId(folderId);
+        String email = (String) session.getAttribute("email");
+        try {
+            User user = userService.findByEmail(email);
+            m.addAttribute("user", user);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         m.addAttribute("note", note);
         m.addAttribute("mode", "add");
         return "noteForm";
@@ -144,6 +151,7 @@ public class NoteController {
             int result = noteService.addNote(note);
             if (result > 0) {
                 reatt.addFlashAttribute("successMessage", "노트가 성공적으로 추가되었습니다.");
+                return "redirect:/note/view?noteId=" + note.getNoteId();
             } else {
                 reatt.addFlashAttribute("errorMessage", "노트 추가에 실패했습니다.");
             }
